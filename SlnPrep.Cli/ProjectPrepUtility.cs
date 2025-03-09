@@ -138,7 +138,7 @@ public static class ProjectPrepUtility
             throw new DirectoryNotFoundException($"Directory not found: {conversionPath}");
 
         var gitIgnorePath = Path.Combine(conversionPath, ".gitignore");
-        File.WriteAllText(gitIgnorePath, FileContents.GitIgnoreContent);
+        File.WriteAllText(gitIgnorePath, FileContentUtility.GitIgnoreContent);
     }
 
     /// <summary>
@@ -160,7 +160,7 @@ public static class ProjectPrepUtility
             throw new DirectoryNotFoundException($"Directory not found: {conversionPath}");
 
         var editorConfigPath = Path.Combine(conversionPath, ".editorconfig");
-        File.WriteAllText(editorConfigPath, FileContents.EditorConfigContent);
+        File.WriteAllText(editorConfigPath, FileContentUtility.EditorConfigContent);
     }
 
     private static IEnumerable<PackageInfo> GetPackageReferences(string projectPath)

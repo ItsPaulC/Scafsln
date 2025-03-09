@@ -8,6 +8,7 @@ A .NET CLI tool for initializing and standardizing .NET solution configurations.
 - **Build Properties**: Sets up common build settings and C# language features
 - **Editor Configuration**: Enforces consistent coding styles through `.editorconfig`
 - **Git Integration**: Provides standard `.gitignore` for .NET projects
+- **Configuration Management**: View and update configuration files
 
 ## Installation
 
@@ -19,11 +20,13 @@ dotnet run --project SlnPrep.Cli/SlnPrep.Cli.csproj
 
 ## Usage
 
+### Initialize Solution
+
 ```bash
 slnprep init-sln [options] <path>
 ```
 
-### Options
+#### Init Options
 
 - `-c|--cpm`: Convert to Nuget CPM in the solution
 - `-b|--buildprops`: Add Directory.Build.props with common build settings
@@ -32,9 +35,23 @@ slnprep init-sln [options] <path>
 - `-a|--all`: Add all configuration files to the solution
 - `-h|--help`: Show help and usage information
 
+### Manage Configuration Files
+
+```bash
+slnprep config [options] [path]
+```
+
+#### Config Options
+
+- `--show-gitignore`: Display the contents of .gitignore
+- `--show-editorconfig`: Display the contents of .editorconfig
+- `--change-editorconfig <file>`: Replace the .editorconfig with a new file
+- `--change-gitignore <file>`: Replace the .gitignore with a new file
+- `-h|--help`: Show help and usage information
+
 ### Example Commands
 
-Add all configuration files:
+Initialize with all configuration files:
 ```bash
 slnprep init-sln -a "C:\path\to\solution"
 ```
@@ -47,6 +64,16 @@ slnprep init-sln -c "C:\path\to\solution"
 Add editor config and gitignore:
 ```bash
 slnprep init-sln -e -g "C:\path\to\solution"
+```
+
+View .gitignore contents:
+```bash
+slnprep config --show-gitignore "C:\path\to\solution"
+```
+
+Update .editorconfig from a template:
+```bash
+slnprep config --change-editorconfig "path\to\template.editorconfig" "C:\path\to\solution"
 ```
 
 ## Generated Files
