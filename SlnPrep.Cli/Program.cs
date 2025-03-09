@@ -16,17 +16,25 @@ public class InitCommand : Command<InitCommand.InitSettings>
 {
     public class InitSettings : CommandSettings
     {
-        [CommandOption("-c|--addCpm")]
-        [Description("Convert to Nuget CPM to the solution")]
-        public bool AddCpm { get; set; }
+        [CommandOption("-c|--cpm")]
+        [Description("Convert to Nuget CPM in the solution")]
+        public bool UseCpm { get; set; }
 
-        [CommandOption("-b|--addBuildProps")]
+        [CommandOption("-b|--buildprops")]
         [Description("Add Directory.Build.props to the solution")]
-        public bool AddBuildProps { get; set; }
+        public bool UseBuildProps { get; set; }
 
-        [CommandOption("-g|--addGitignore")]
+        [CommandOption("-g|--gitignore")]
         [Description("Add .gitignore file to the solution")]
-        public bool AddGitignore { get; set; }
+        public bool UseGitignore { get; set; }
+
+        [CommandOption("-e|--editorconfig")]
+        [Description("Add .editorconfig file to the solution")]
+        public bool UseEditorConfig { get; set; }
+
+        [CommandOption("-a|--all")]
+        [Description("Add all configuration files to the solution")]
+        public bool UseAll { get; set; }
 
         [CommandArgument(0, "<path>")]
         [Description("Path to run init against")]
@@ -64,7 +72,12 @@ public class InitCommand : Command<InitCommand.InitSettings>
             return 1;
         }
 
-        if (settings.AddCpm)
+        var shouldAddCpm = settings.UseCpm || settings.UseAll;
+        var shouldAddBuildProps = settings.UseBuildProps || settings.UseAll;
+        var shouldAddGitignore = settings.UseGitignore || settings.UseAll;
+        var shouldAddEditorConfig = settings.UseEditorConfig || settings.UseAll;
+
+        if (shouldAddCpm)
         {
             AnsiConsole.MarkupLine("[green]Adding CPM...[/]");
             try
@@ -79,7 +92,7 @@ public class InitCommand : Command<InitCommand.InitSettings>
             }
         }
         
-        if (settings.AddBuildProps)
+        if (shouldAddBuildProps)
         {
             AnsiConsole.MarkupLine("[green]Adding Directory.Build.props...[/]");
             try
@@ -94,7 +107,7 @@ public class InitCommand : Command<InitCommand.InitSettings>
             }
         }
         
-        if (settings.AddGitignore)
+        if (shouldAddGitignore)
         {
             AnsiConsole.MarkupLine("[green]Adding .gitignore...[/]");
             try
@@ -109,7 +122,22 @@ public class InitCommand : Command<InitCommand.InitSettings>
             }
         }
 
-        if (!settings.AddCpm && !settings.AddBuildProps && !settings.AddGitignore)
+        if (shouldAddEditorConfig)
+        {
+            AnsiConsole.MarkupLine("[green]Adding .editorconfig...[/]");
+            try
+            {
+                ProjectPrepUtility.CreateEditorConfig(settings.Path);
+                AnsiConsole.MarkupLine("[green]Successfully created .editorconfig[/]");
+            }
+            catch (Exception ex) when (ex is ArgumentNullException or ArgumentException or DirectoryNotFoundException)
+            {
+                AnsiConsole.MarkupLine($"[red]Error creating .editorconfig: {ex.Message}[/]");
+                return 1;
+            }
+        }
+
+        if (!shouldAddCpm && !shouldAddBuildProps && !shouldAddGitignore && !shouldAddEditorConfig)
             AnsiConsole.MarkupLine("[yellow]No options selected. Use -h or --help to see available options.[/]");
 
         return 0;
