@@ -5,11 +5,29 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    
+    <!-- NuGet package properties -->
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>slnprep</ToolCommandName>
+    <PackageOutputPath>./nupkg</PackageOutputPath>
+    <PackageId>SlnPrep.Cli</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Your Name</Authors>
+    <Company>Your Company</Company>
+    <Description>A .NET CLI tool for initializing and standardizing .NET solution configurations.</Description>
+    <PackageProjectUrl>https://github.com/yourusername/SlnPrep</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/yourusername/SlnPrep</RepositoryUrl>
+    <PackageTags>dotnet-tool;solution;configuration;standards</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Spectre.Console" Version="0.49.1" />
     <PackageReference Include="Spectre.Console.Cli" Version="0.49.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>
