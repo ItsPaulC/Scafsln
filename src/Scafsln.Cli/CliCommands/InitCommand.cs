@@ -83,7 +83,7 @@ public class InitCommand : Command<InitCommand.InitSettings>
                 return 1;
             }
         }
-        
+
         if (shouldAddBuildProps)
         {
             AnsiConsole.MarkupLine("[green]Adding Directory.Build.props...[/]");
@@ -98,7 +98,7 @@ public class InitCommand : Command<InitCommand.InitSettings>
                 return 1;
             }
         }
-        
+
         if (shouldAddGitignore)
         {
             AnsiConsole.MarkupLine("[green]Adding .gitignore...[/]");

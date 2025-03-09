@@ -26,10 +26,10 @@ public static class ProjectPrepUtility
     {
         if (conversionPath is null)
             throw new ArgumentNullException(nameof(conversionPath));
-            
+
         if (string.IsNullOrWhiteSpace(conversionPath))
             throw new ArgumentException("Path cannot be empty or whitespace", nameof(conversionPath));
-            
+
         if (!Directory.Exists(conversionPath))
             throw new DirectoryNotFoundException($"Directory not found: {conversionPath}");
 
@@ -57,7 +57,7 @@ public static class ProjectPrepUtility
                 kvp =>
                 {
                     var nonConstrainedVersions = kvp.Value.Where(p => !p.HasVersionConstraint);
-                    return nonConstrainedVersions.Any() 
+                    return nonConstrainedVersions.Any()
                         ? nonConstrainedVersions
                             .OrderByDescending(p => new Version(p.Version))
                             .First()
@@ -72,11 +72,11 @@ public static class ProjectPrepUtility
 
         // Create Directory.Packages.props with highest versions (excluding constrained versions)
         string packagesPropsPath = Path.Combine(conversionPath, "Directory.Packages.props");
-        string packageRefs = string.Join(Environment.NewLine, 
+        string packageRefs = string.Join(Environment.NewLine,
             highestVersions
                 .Where(kvp => kvp.Value != null)
                 .Select(kvp => $"    <PackageVersion Include=\"{kvp.Key}\" Version=\"{kvp.Value}\" />"));
-        
+
         string content = $"""
 <Project>
   <PropertyGroup>
@@ -102,10 +102,10 @@ public static class ProjectPrepUtility
     {
         if (conversionPath is null)
             throw new ArgumentNullException(nameof(conversionPath));
-            
+
         if (string.IsNullOrWhiteSpace(conversionPath))
             throw new ArgumentException("Path cannot be empty or whitespace", nameof(conversionPath));
-            
+
         if (!Directory.Exists(conversionPath))
             throw new DirectoryNotFoundException($"Directory not found: {conversionPath}");
 
@@ -143,10 +143,10 @@ public static class ProjectPrepUtility
     {
         if (conversionPath is null)
             throw new ArgumentNullException(nameof(conversionPath));
-            
+
         if (string.IsNullOrWhiteSpace(conversionPath))
             throw new ArgumentException("Path cannot be empty or whitespace", nameof(conversionPath));
-            
+
         if (!Directory.Exists(conversionPath))
             throw new DirectoryNotFoundException($"Directory not found: {conversionPath}");
 
@@ -165,10 +165,10 @@ public static class ProjectPrepUtility
     {
         if (conversionPath is null)
             throw new ArgumentNullException(nameof(conversionPath));
-            
+
         if (string.IsNullOrWhiteSpace(conversionPath))
             throw new ArgumentException("Path cannot be empty or whitespace", nameof(conversionPath));
-            
+
         if (!Directory.Exists(conversionPath))
             throw new DirectoryNotFoundException($"Directory not found: {conversionPath}");
 

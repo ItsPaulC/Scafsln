@@ -115,9 +115,14 @@ public class ConfigCommand : Command<ConfigCommand.ConfigSettings>
             }
         }
 
-        if (!settings.ShowGitignore && !settings.ShowEditorconfig && 
-            settings.NewEditorconfig == null && settings.NewGitignore == null &&
-            !settings.Reset)
+        if (settings is
+            {
+                ShowGitignore: false,
+                ShowEditorconfig: false,
+                NewEditorconfig: null,
+                NewGitignore: null,
+                Reset: false
+            })
         {
             AnsiConsole.MarkupLine("[yellow]No options selected. Use -h or --help to see available options.[/]");
         }

@@ -93,7 +93,7 @@ public static class FileContentUtility
     {
         if (sourcePath is null)
             throw new ArgumentNullException(nameof(sourcePath));
-            
+
         if (string.IsNullOrWhiteSpace(sourcePath))
             throw new ArgumentException("Path cannot be empty or whitespace", nameof(sourcePath));
 

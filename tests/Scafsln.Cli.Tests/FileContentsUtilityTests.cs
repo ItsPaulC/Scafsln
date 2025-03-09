@@ -1,11 +1,9 @@
-using Scafsln.Cli;
-
 namespace Scafsln.Cli.Tests;
 
 public class FileContentsUtilityTests
 {
     [Fact]
-    public async Task TestReset_Gitignore()
+    public async Task TestUpdateAndReset_Gitignore()
     {
         // Load initial .gitignore content
         string initialContent = FileContentUtility.GitIgnoreContent;
@@ -35,7 +33,7 @@ public class FileContentsUtilityTests
     }
 
     [Fact]
-    public async Task TestReset_EditorConfig()
+    public async Task TestUpdateAndReset_EditorConfig()
     {
         // Load initial .editorconfig content
         string initialContent = FileContentUtility.EditorConfigContent;
