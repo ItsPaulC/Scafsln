@@ -18,27 +18,47 @@ public static class FileContentUtility
     /// <summary>
     /// Updates the .gitignore template by copying the contents from the specified file
     /// </summary>
-    /// <param name="path">The full path to the .gitignore file to read from</param>
+    /// <param name="sourcePath">The full path to the .gitignore file to read from</param>
     /// <exception cref="ArgumentNullException">Thrown when path is null</exception>
     /// <exception cref="ArgumentException">Thrown when path is empty or whitespace</exception>
     /// <exception cref="FileNotFoundException">Thrown when the specified file does not exist</exception>
     /// <exception cref="IOException">Thrown when there's an error creating the Templates directory or saving the file</exception>
-    public static void UpdateGitIgnoreContent(string path)
+    public static void UpdateGitIgnoreContent(string sourcePath)
     {
-        UpdateTemplateContent(path, "gitignore-template");
+        UpdateTemplateContent(sourcePath, "gitignore-template");
     }
 
     /// <summary>
     /// Updates the .editorconfig template by copying the contents from the specified file
     /// </summary>
-    /// <param name="path">The full path to the .editorconfig file to read from</param>
+    /// <param name="sourcePath">The full path to the .editorconfig file to read from</param>
     /// <exception cref="ArgumentNullException">Thrown when path is null</exception>
     /// <exception cref="ArgumentException">Thrown when path is empty or whitespace</exception>
     /// <exception cref="FileNotFoundException">Thrown when the specified file does not exist</exception>
     /// <exception cref="IOException">Thrown when there's an error creating the Templates directory or saving the file</exception>
-    public static void UpdateEditorconfigContent(string path)
+    public static void UpdateEditorconfigContent(string sourcePath)
     {
-        UpdateTemplateContent(path, "editorconfig-template");
+        UpdateTemplateContent(sourcePath, "editorconfig-template");
+    }
+
+    /// <summary>
+    /// Resets the template files by deleting them, which will cause the system to use default templates
+    /// </summary>
+    public static void Reset()
+    {
+        string templatesDir = Path.Combine(AppContext.BaseDirectory, "Templates");
+        string gitignoreTemplate = Path.Combine(templatesDir, "gitignore-template");
+        string editorconfigTemplate = Path.Combine(templatesDir, "editorconfig-template");
+
+        if (File.Exists(gitignoreTemplate))
+        {
+            File.Delete(gitignoreTemplate);
+        }
+
+        if (File.Exists(editorconfigTemplate))
+        {
+            File.Delete(editorconfigTemplate);
+        }
     }
 
     private static string LoadGitIgnoreTemplate()

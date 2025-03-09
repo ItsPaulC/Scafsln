@@ -18,11 +18,15 @@ public class ConfigCommand : Command<ConfigCommand.ConfigSettings>
 
         [CommandOption("--change-editorconfig")]
         [Description("Change the .editorconfig file")]
-        public string? EditorConfigPath { get; set; }
+        public string? NewEditorconfig { get; set; }
 
         [CommandOption("--change-gitignore")]
         [Description("Change the .gitignore file")]
-        public string? GitignorePath { get; set; }
+        public string? NewGitignore { get; set; }
+
+        [CommandOption("--reset")]
+        [Description("Reset templates to default values")]
+        public bool Reset { get; set; }
 
         [CommandArgument(0, "[path]")]
         [Description("Path to the solution directory")]
@@ -30,24 +34,28 @@ public class ConfigCommand : Command<ConfigCommand.ConfigSettings>
 
         public override ValidationResult Validate()
         {
-            if (string.IsNullOrWhiteSpace(Path))
+            // Only validate path if we're doing an operation that requires it
+            if (NewEditorconfig != null || NewGitignore != null)
             {
-                return ValidationResult.Error("Path must be provided.");
+                if (string.IsNullOrWhiteSpace(Path))
+                {
+                    return ValidationResult.Error("Path must be provided when using --change-editorconfig or --change-gitignore.");
+                }
+
+                if (!Directory.Exists(Path))
+                {
+                    return ValidationResult.Error($"Directory {Path} does not exist.");
+                }
             }
 
-            if (!Directory.Exists(Path))
+            if (NewEditorconfig != null && !File.Exists(NewEditorconfig))
             {
-                return ValidationResult.Error($"Directory {Path} does not exist.");
+                return ValidationResult.Error($"Editor config file {NewEditorconfig} does not exist.");
             }
 
-            if (EditorConfigPath != null && !File.Exists(EditorConfigPath))
+            if (NewGitignore != null && !File.Exists(NewGitignore))
             {
-                return ValidationResult.Error($"Editor config file {EditorConfigPath} does not exist.");
-            }
-
-            if (GitignorePath != null && !File.Exists(GitignorePath))
-            {
-                return ValidationResult.Error($"Gitignore file {GitignorePath} does not exist.");
+                return ValidationResult.Error($"Gitignore file {NewGitignore} does not exist.");
             }
 
             return ValidationResult.Success();
@@ -56,62 +64,60 @@ public class ConfigCommand : Command<ConfigCommand.ConfigSettings>
 
     public override int Execute(CommandContext context, ConfigSettings settings)
     {
+        if (settings.Reset)
+        {
+            if (AnsiConsole.Confirm("This will reset any templates. Are you sure you want to continue?"))
+            {
+                FileContentUtility.Reset();
+                AnsiConsole.MarkupLine("[green]Templates have been reset to default values[/]");
+                return 0;
+            }
+            return 0;
+        }
+
         if (settings.ShowGitignore)
         {
-            var gitignorePath = Path.Combine(settings.Path, ".gitignore");
-            if (!File.Exists(gitignorePath))
-            {
-                AnsiConsole.MarkupLine("[red]No .gitignore file found in the specified directory.[/]");
-                return 1;
-            }
-            var content = File.ReadAllText(gitignorePath);
             AnsiConsole.MarkupLine("[blue].gitignore contents:[/]");
-            AnsiConsole.WriteLine(content);
+            AnsiConsole.WriteLine(FileContentUtility.GitIgnoreContent);
         }
 
         if (settings.ShowEditorconfig)
         {
-            var editorconfigPath = Path.Combine(settings.Path, ".editorconfig");
-            if (!File.Exists(editorconfigPath))
-            {
-                AnsiConsole.MarkupLine("[red]No .editorconfig file found in the specified directory.[/]");
-                return 1;
-            }
-            var content = File.ReadAllText(editorconfigPath);
             AnsiConsole.MarkupLine("[blue].editorconfig contents:[/]");
-            AnsiConsole.WriteLine(content);
+            AnsiConsole.WriteLine(FileContentUtility.EditorConfigContent);
         }
 
-        if (settings.EditorConfigPath != null)
+        if (settings.NewEditorconfig != null)
         {
             try
             {
-                File.Copy(settings.EditorConfigPath, Path.Combine(settings.Path, ".editorconfig"), true);
-                AnsiConsole.MarkupLine("[green]Successfully updated .editorconfig[/]");
+                FileContentUtility.UpdateEditorconfigContent(settings.NewEditorconfig);
+                AnsiConsole.MarkupLine("[green]Successfully saved new .editorconfig template[/]");
             }
             catch (Exception ex)
             {
-                AnsiConsole.MarkupLine($"[red]Error updating .editorconfig: {ex.Message}[/]");
+                AnsiConsole.MarkupLine($"[red]Error updating .editorconfig template: {ex.Message}[/]");
                 return 1;
             }
         }
 
-        if (settings.GitignorePath != null)
+        if (settings.NewGitignore != null)
         {
             try
             {
-                File.Copy(settings.GitignorePath, Path.Combine(settings.Path, ".gitignore"), true);
-                AnsiConsole.MarkupLine("[green]Successfully updated .gitignore[/]");
+                FileContentUtility.UpdateGitIgnoreContent(settings.NewGitignore);
+                AnsiConsole.MarkupLine("[green]Successfully saved new .gitignore template[/]");
             }
             catch (Exception ex)
             {
-                AnsiConsole.MarkupLine($"[red]Error updating .gitignore: {ex.Message}[/]");
+                AnsiConsole.MarkupLine($"[red]Error updating .gitignore template: {ex.Message}[/]");
                 return 1;
             }
         }
 
         if (!settings.ShowGitignore && !settings.ShowEditorconfig && 
-            settings.EditorConfigPath == null && settings.GitignorePath == null)
+            settings.NewEditorconfig == null && settings.NewGitignore == null &&
+            !settings.Reset)
         {
             AnsiConsole.MarkupLine("[yellow]No options selected. Use -h or --help to see available options.[/]");
         }

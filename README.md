@@ -8,7 +8,7 @@ A .NET CLI tool for initializing and standardizing .NET solution configurations.
 - **Build Properties**: Sets up common build settings and C# language features
 - **Editor Configuration**: Enforces consistent coding styles through `.editorconfig`
 - **Git Integration**: Provides standard `.gitignore` for .NET projects
-- **Configuration Management**: View and update configuration files
+- **Configuration Management**: View and update configuration files with template support
 
 ## Installation
 
@@ -41,13 +41,20 @@ slnprep init-sln [options] <path>
 slnprep config [options] [path]
 ```
 
+Path is only required when using the change commands.
+
 #### Config Options
 
-- `--show-gitignore`: Display the contents of .gitignore
-- `--show-editorconfig`: Display the contents of .editorconfig
-- `--change-editorconfig <file>`: Replace the .editorconfig with a new file
-- `--change-gitignore <file>`: Replace the .gitignore with a new file
+- `--show-gitignore`: Display the contents of the current .gitignore template
+- `--show-editorconfig`: Display the contents of the current .editorconfig template
+- `--change-editorconfig <file>`: Update the .editorconfig template from a new source
+- `--change-gitignore <file>`: Update the .gitignore template from a new source
+- `--reset`: Reset templates to their default values
 - `-h|--help`: Show help and usage information
+
+When using the `--change-editorconfig` or `--change-gitignore` options, the provided file will be:
+- Saved as a template for future use
+- Used as the default content for future operations
 
 ### Example Commands
 
@@ -68,12 +75,17 @@ slnprep init-sln -e -g "C:\path\to\solution"
 
 View .gitignore contents:
 ```bash
-slnprep config --show-gitignore "C:\path\to\solution"
+slnprep config --show-gitignore
 ```
 
-Update .editorconfig from a template:
+Update .editorconfig template:
 ```bash
-slnprep config --change-editorconfig "path\to\template.editorconfig" "C:\path\to\solution"
+slnprep config --change-editorconfig "path\to\template.editorconfig"
+```
+
+Reset templates to default:
+```bash
+slnprep config --reset
 ```
 
 ## Generated Files
