@@ -42,7 +42,7 @@ public static class ProjectPrepUtility
             {
                 if (!packageVersions.ContainsKey(package.Name))
                 {
-                    packageVersions[package.Name] = new List<PackageInfo>();
+                    packageVersions[package.Name] = new();
                 }
                 packageVersions[package.Name].Add(package);
             }
@@ -96,7 +96,7 @@ public static class ProjectPrepUtility
         if (!Directory.Exists(conversionPath))
             throw new DirectoryNotFoundException($"Directory not found: {conversionPath}");
 
-        var buildPropsContent = """
+        string buildPropsContent = """
 <Project>
     <PropertyGroup>
         <LangVersion>latest</LangVersion>
@@ -115,7 +115,7 @@ public static class ProjectPrepUtility
 </Project>
 """;
 
-        var buildPropsPath = Path.Combine(conversionPath, "Directory.Build.props");
+        string buildPropsPath = Path.Combine(conversionPath, "Directory.Build.props");
         File.WriteAllText(buildPropsPath, buildPropsContent);
     }
 
@@ -137,7 +137,7 @@ public static class ProjectPrepUtility
         if (!Directory.Exists(conversionPath))
             throw new DirectoryNotFoundException($"Directory not found: {conversionPath}");
 
-        var gitIgnorePath = Path.Combine(conversionPath, ".gitignore");
+        string gitIgnorePath = Path.Combine(conversionPath, ".gitignore");
         File.WriteAllText(gitIgnorePath, FileContentUtility.GitIgnoreContent);
     }
 
@@ -159,7 +159,7 @@ public static class ProjectPrepUtility
         if (!Directory.Exists(conversionPath))
             throw new DirectoryNotFoundException($"Directory not found: {conversionPath}");
 
-        var editorConfigPath = Path.Combine(conversionPath, ".editorconfig");
+        string editorConfigPath = Path.Combine(conversionPath, ".editorconfig");
         File.WriteAllText(editorConfigPath, FileContentUtility.EditorConfigContent);
     }
 

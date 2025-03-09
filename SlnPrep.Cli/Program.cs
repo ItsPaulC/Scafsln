@@ -1,7 +1,7 @@
 ﻿using Spectre.Console.Cli;
 using SlnPrep.Cli.CliCommands;
 
-var app = new CommandApp();
+CommandApp app = new();
 app.Configure(config =>
 {
     config.AddCommand<InitCommand>("init-sln")

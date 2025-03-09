@@ -44,7 +44,7 @@ public class InitCommand : Command<InitCommand.InitSettings>
                 return ValidationResult.Error("Path must be a full path (e.g., C:\\path\\to\\solution).");
             }
 
-            var drive = System.IO.Path.GetPathRoot(Path);
+            string? drive = System.IO.Path.GetPathRoot(Path);
             if (!Directory.Exists(drive))
             {
                 return ValidationResult.Error($"Drive {drive} does not exist.");
@@ -64,10 +64,10 @@ public class InitCommand : Command<InitCommand.InitSettings>
             return 1;
         }
 
-        var shouldAddCpm = settings.UseCpm || settings.UseAll;
-        var shouldAddBuildProps = settings.UseBuildProps || settings.UseAll;
-        var shouldAddGitignore = settings.UseGitignore || settings.UseAll;
-        var shouldAddEditorConfig = settings.UseEditorConfig || settings.UseAll;
+        bool shouldAddCpm = settings.UseCpm || settings.UseAll;
+        bool shouldAddBuildProps = settings.UseBuildProps || settings.UseAll;
+        bool shouldAddGitignore = settings.UseGitignore || settings.UseAll;
+        bool shouldAddEditorConfig = settings.UseEditorConfig || settings.UseAll;
 
         if (shouldAddCpm)
         {
