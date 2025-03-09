@@ -64,6 +64,16 @@ This document provides instructions for GitHub Copilot to assist in writing C# c
 3.  Include error handling and logging.
 4.  Provide unit tests for the endpoint.
 5.  Document the code with XML comments.
+6.  Use asynchronous programming for database operations.
+7.  Follow RESTful API design principles.
+8.  Optimize the code for performance.
+9.  Use dependency injection for services.
+10. Include clear and concise comments to explain the logic.
+11. Use the latest C# features and .NET 8 libraries.
+12. Ensure the code is well-structured and maintainable.
+13. Consider scalability and security aspects.
+14. Suggest best practices for testing and deployment.
+15. give PowerShell commands for CLI operations.
 
 ## Interaction Style
 
