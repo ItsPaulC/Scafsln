@@ -1,5 +1,5 @@
 ﻿using Spectre.Console.Cli;
-using SlnPrep.Cli.CliCommands;
+using Scafsln.Cli.CliCommands;
 
 CommandApp app = new();
 app.Configure(config =>

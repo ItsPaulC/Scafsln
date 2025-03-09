@@ -2,7 +2,7 @@ using Spectre.Console;
 using Spectre.Console.Cli;
 using System.ComponentModel;
 
-namespace SlnPrep.Cli.CliCommands;
+namespace Scafsln.Cli.CliCommands;
 
 public class InitCommand : Command<InitCommand.InitSettings>
 {

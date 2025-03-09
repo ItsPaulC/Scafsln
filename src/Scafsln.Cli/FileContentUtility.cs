@@ -1,4 +1,4 @@
-namespace SlnPrep.Cli;
+namespace Scafsln.Cli;
 
 /// <summary>
 /// Utility class providing access to standard configuration file contents

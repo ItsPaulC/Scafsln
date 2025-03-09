@@ -1,4 +1,4 @@
-namespace SlnPrep.Cli;
+namespace Scafsln.Cli;
 
 /// <summary>
 /// Contains static content for various configuration files
