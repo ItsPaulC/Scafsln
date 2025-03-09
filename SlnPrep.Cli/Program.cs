@@ -6,7 +6,7 @@ using SlnPrep.Cli;
 var app = new CommandApp();
 app.Configure(config =>
 {
-    config.AddCommand<InitCommand>("init")
+    config.AddCommand<InitCommand>("init-sln")
         .WithDescription("Initialize solution with common files and configurations");
 });
 

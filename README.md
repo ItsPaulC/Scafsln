@@ -20,7 +20,7 @@ dotnet run --project SlnPrep.Cli/SlnPrep.Cli.csproj
 ## Usage
 
 ```bash
-slnprep init [options] <path>
+slnprep init-sln [options] <path>
 ```
 
 ### Options
@@ -36,17 +36,17 @@ slnprep init [options] <path>
 
 Add all configuration files:
 ```bash
-slnprep init -a "C:\path\to\solution"
+slnprep init-sln -a "C:\path\to\solution"
 ```
 
 Add only central package management:
 ```bash
-slnprep init -c "C:\path\to\solution"
+slnprep init-sln -c "C:\path\to\solution"
 ```
 
 Add editor config and gitignore:
 ```bash
-slnprep init -e -g "C:\path\to\solution"
+slnprep init-sln -e -g "C:\path\to\solution"
 ```
 
 ## Generated Files
