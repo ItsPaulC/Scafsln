@@ -74,7 +74,7 @@ public class InitCommand : Command<InitCommand.InitSettings>
             AnsiConsole.MarkupLine("[green]Adding CPM...[/]");
             try
             {
-                ProjectPrepUtility.CreatePackagesPropsFile(settings.Path);
+                ProjectPrepUtility.CreateDirectoryPackagesPropsFile(settings.Path);
                 AnsiConsole.MarkupLine("[green]Successfully created Directory.Packages.props[/]");
             }
             catch (Exception ex) when (ex is ArgumentNullException or ArgumentException or DirectoryNotFoundException)

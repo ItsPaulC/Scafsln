@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using System.Text.RegularExpressions;
 
 namespace SlnPrep.Cli;
 
@@ -11,7 +12,8 @@ namespace SlnPrep.Cli;
 /// </summary>
 public static class ProjectPrepUtility
 {
-    private record PackageInfo(string Name, string Version);
+    private record PackageInfo(string Name, string Version, bool HasVersionConstraint);
+    private static readonly Regex VersionConstraintPattern = new(@"[\*\>\<\^\~\[\]]");
 
     /// <summary>
     /// Creates a Directory.Packages.props file at the specified path for central package management
@@ -20,7 +22,7 @@ public static class ProjectPrepUtility
     /// <exception cref="ArgumentNullException">Thrown when conversionPath is null</exception>
     /// <exception cref="ArgumentException">Thrown when conversionPath is empty or whitespace</exception>
     /// <exception cref="DirectoryNotFoundException">Thrown when the specified directory does not exist</exception>
-    public static void CreatePackagesPropsFile(string conversionPath)
+    public static void CreateDirectoryPackagesPropsFile(string conversionPath)
     {
         if (conversionPath is null)
             throw new ArgumentNullException(nameof(conversionPath));
@@ -48,21 +50,32 @@ public static class ProjectPrepUtility
             }
         }
 
-        // Determine highest versions and update project files
-        Dictionary<string, string> highestVersions = packageVersions.ToDictionary(
-            kvp => kvp.Key,
-            kvp => kvp.Value.OrderByDescending(p => new Version(p.Version)).First().Version
-        );
+        // Filter out constrained versions and determine highest versions
+        Dictionary<string, string?> highestVersions = packageVersions
+            .ToDictionary(
+                kvp => kvp.Key,
+                kvp =>
+                {
+                    var nonConstrainedVersions = kvp.Value.Where(p => !p.HasVersionConstraint);
+                    return nonConstrainedVersions.Any() 
+                        ? nonConstrainedVersions
+                            .OrderByDescending(p => new Version(p.Version))
+                            .First()
+                            .Version
+                        : null;
+                });
 
         foreach (string projectFile in projectFiles)
         {
             UpdateProjectFile(projectFile, highestVersions);
         }
 
-        // Create Directory.Packages.props with highest versions
+        // Create Directory.Packages.props with highest versions (excluding constrained versions)
         string packagesPropsPath = Path.Combine(conversionPath, "Directory.Packages.props");
         string packageRefs = string.Join(Environment.NewLine, 
-            highestVersions.Select(kvp => $"    <PackageVersion Include=\"{kvp.Key}\" Version=\"{kvp.Value}\" />"));
+            highestVersions
+                .Where(kvp => kvp.Value != null)
+                .Select(kvp => $"    <PackageVersion Include=\"{kvp.Key}\" Version=\"{kvp.Value}\" />"));
         
         string content = $"""
 <Project>
@@ -168,15 +181,21 @@ public static class ProjectPrepUtility
         XDocument doc = XDocument.Load(projectPath);
         IEnumerable<PackageInfo> packageRefs = doc.Descendants("PackageReference")
             .Where(x => x.Attribute("Include") != null && x.Attribute("Version") != null)
-            .Select(x => new PackageInfo(
-                x.Attribute("Include")!.Value,
-                x.Attribute("Version")!.Value
-            ));
+            .Select(x =>
+            {
+                string version = x.Attribute("Version")!.Value;
+                bool hasConstraint = VersionConstraintPattern.IsMatch(version);
+                return new PackageInfo(
+                    x.Attribute("Include")!.Value,
+                    version,
+                    hasConstraint
+                );
+            });
 
         return packageRefs;
     }
 
-    private static void UpdateProjectFile(string projectPath, Dictionary<string, string> highestVersions)
+    private static void UpdateProjectFile(string projectPath, Dictionary<string, string?> highestVersions)
     {
         XDocument doc = XDocument.Load(projectPath);
         bool modified = false;
@@ -191,7 +210,17 @@ public static class ProjectPrepUtility
             string packageName = includeAttr.Value;
             string packageVersion = versionAttr.Value;
 
-            if (highestVersions.TryGetValue(packageName, out string? highestVersion))
+            // Check if this package has a version constraint
+            bool hasConstraint = VersionConstraintPattern.IsMatch(packageVersion);
+
+            if (hasConstraint)
+            {
+                // Always change constrained versions to VersionOverride
+                versionAttr.Remove();
+                packageRef.Add(new XAttribute("VersionOverride", packageVersion));
+                modified = true;
+            }
+            else if (highestVersions.TryGetValue(packageName, out string? highestVersion) && highestVersion != null)
             {
                 if (packageVersion == highestVersion)
                 {
