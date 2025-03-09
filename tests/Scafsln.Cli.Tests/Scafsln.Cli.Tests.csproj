@@ -24,4 +24,13 @@
       <ProjectReference Include="..\..\src\Scafsln.Cli\Scafsln.Cli.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="Assets\.gitignore">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Assets\.editorconfig">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>
