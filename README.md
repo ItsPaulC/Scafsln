@@ -1,6 +1,6 @@
-# SlnPrep
+# Scafsln
 
-A .NET CLI tool for initializing and standardizing .NET solution configurations. SlnPrep helps you quickly set up common configuration files and enforce consistent coding standards across your .NET projects.
+A .NET CLI tool for initializing and standardizing .NET solution configurations. Scafsln helps you quickly set up common configuration files and enforce consistent coding standards across your .NET projects.
 
 ## Features
 
@@ -15,7 +15,7 @@ A .NET CLI tool for initializing and standardizing .NET solution configurations.
 Currently, the tool can be run directly from the source:
 
 ```bash
-dotnet run --project SlnPrep.Cli/SlnPrep.Cli.csproj
+dotnet run --project Scafsln.Cli/Scafsln.Cli.csproj
 ```
 
 ## Usage
@@ -23,7 +23,7 @@ dotnet run --project SlnPrep.Cli/SlnPrep.Cli.csproj
 ### Initialize Solution
 
 ```bash
-slnprep init-sln [options] <path>
+scafsln init-sln [options] <path>
 ```
 
 #### Init Options
@@ -38,7 +38,7 @@ slnprep init-sln [options] <path>
 ### Manage Configuration Files
 
 ```bash
-slnprep config [options] [path]
+scafsln config [options] [path]
 ```
 
 Path is only required when using the change commands.
@@ -60,32 +60,32 @@ When using the `--change-editorconfig` or `--change-gitignore` options, the prov
 
 Initialize with all configuration files:
 ```bash
-slnprep init-sln -a "C:\path\to\solution"
+scafsln init-sln -a "C:\path\to\solution"
 ```
 
 Add only central package management:
 ```bash
-slnprep init-sln -c "C:\path\to\solution"
+scafsln init-sln -c "C:\path\to\solution"
 ```
 
 Add editor config and gitignore:
 ```bash
-slnprep init-sln -e -g "C:\path\to\solution"
+scafsln init-sln -e -g "C:\path\to\solution"
 ```
 
 View .gitignore contents:
 ```bash
-slnprep config --show-gitignore
+scafsln config --show-gitignore
 ```
 
 Update .editorconfig template:
 ```bash
-slnprep config --change-editorconfig "path\to\template.editorconfig"
+scafsln config --change-editorconfig "path\to\template.editorconfig"
 ```
 
 Reset templates to default:
 ```bash
-slnprep config --reset
+scafsln config --reset
 ```
 
 ## Generated Files

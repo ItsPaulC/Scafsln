@@ -19,6 +19,7 @@
     <RepositoryUrl>https://github.com/yourusername/SlnPrep</RepositoryUrl>
     <PackageTags>dotnet-tool;solution;configuration;standards</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <AssemblyName>Scafsln</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
