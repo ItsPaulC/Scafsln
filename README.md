@@ -5,7 +5,7 @@ A .NET CLI tool for initializing and standardizing .NET solution configurations.
 ## Features
 
 - **Central Package Management (CPM)**: Automatically consolidates and manages NuGet package versions across your solution
-- **Build Properties**: Sets up common build settings and C# language features
+- **Build Properties**: Sets up common build settings and C# language features (automatically included with CPM)
 - **Editor Configuration**: Enforces consistent coding styles through `.editorconfig`
 - **Git Integration**: Provides standard `.gitignore` for .NET projects
 - **Configuration Management**: View and update configuration files with template support
@@ -28,8 +28,7 @@ scafsln init-sln [options] <path>
 
 #### Init Options
 
-- `-c|--cpm`: Convert to Nuget CPM in the solution
-- `-b|--buildprops`: Add Directory.Build.props with common build settings
+- `-c|--cpm`: Convert to Nuget CPM in the solution (automatically includes Directory.Build.props)
 - `-g|--gitignore`: Add .gitignore file with .NET-specific patterns
 - `-e|--editorconfig`: Add .editorconfig with C# coding style settings
 - `-a|--all`: Add all configuration files to the solution
@@ -96,6 +95,7 @@ scafsln config --reset
 - Automatically detects and uses highest package versions
 
 ### Directory.Build.props
+- Automatically created when using the CPM option
 - Enables latest C# language features
 - Configures nullable reference types
 - Sets up warning as errors for nullable violations

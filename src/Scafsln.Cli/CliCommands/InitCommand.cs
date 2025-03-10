@@ -12,10 +12,6 @@ public class InitCommand : Command<InitCommand.InitSettings>
         [Description("Convert to Nuget CPM in the solution")]
         public bool UseCpm { get; set; }
 
-        [CommandOption("-b|--buildprops")]
-        [Description("Add Directory.Build.props to the solution")]
-        public bool UseBuildProps { get; set; }
-
         [CommandOption("-g|--gitignore")]
         [Description("Add .gitignore file to the solution")]
         public bool UseGitignore { get; set; }
@@ -65,7 +61,6 @@ public class InitCommand : Command<InitCommand.InitSettings>
         }
 
         bool shouldAddCpm = settings.UseCpm || settings.UseAll;
-        bool shouldAddBuildProps = settings.UseBuildProps || settings.UseAll;
         bool shouldAddGitignore = settings.UseGitignore || settings.UseAll;
         bool shouldAddEditorConfig = settings.UseEditorConfig || settings.UseAll;
 
@@ -80,21 +75,6 @@ public class InitCommand : Command<InitCommand.InitSettings>
             catch (Exception ex) when (ex is ArgumentNullException or ArgumentException or DirectoryNotFoundException)
             {
                 AnsiConsole.MarkupLine($"[red]Error creating Directory.Packages.props: {ex.Message}[/]");
-                return 1;
-            }
-        }
-
-        if (shouldAddBuildProps)
-        {
-            AnsiConsole.MarkupLine("[green]Adding Directory.Build.props...[/]");
-            try
-            {
-                ProjectPrepUtility.CreateBuildPropsFile(settings.Path);
-                AnsiConsole.MarkupLine("[green]Successfully created Directory.Build.props[/]");
-            }
-            catch (Exception ex) when (ex is ArgumentNullException or ArgumentException or DirectoryNotFoundException)
-            {
-                AnsiConsole.MarkupLine($"[red]Error creating Directory.Build.props: {ex.Message}[/]");
                 return 1;
             }
         }
@@ -129,7 +109,7 @@ public class InitCommand : Command<InitCommand.InitSettings>
             }
         }
 
-        if (!shouldAddCpm && !shouldAddBuildProps && !shouldAddGitignore && !shouldAddEditorConfig)
+        if (!shouldAddCpm && !shouldAddGitignore && !shouldAddEditorConfig)
             AnsiConsole.MarkupLine("[yellow]No options selected. Use -h or --help to see available options.[/]");
 
         return 0;

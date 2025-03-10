@@ -89,6 +89,9 @@ public static class ProjectPrepUtility
 """;
 
         File.WriteAllText(packagesPropsPath, content);
+
+        // Call CreateBuildPropsFile to create Directory.Build.props
+        CreateBuildPropsFile(conversionPath);
     }
 
     /// <summary>
@@ -98,7 +101,7 @@ public static class ProjectPrepUtility
     /// <exception cref="ArgumentNullException">Thrown when conversionPath is null</exception>
     /// <exception cref="ArgumentException">Thrown when conversionPath is empty or whitespace</exception>
     /// <exception cref="DirectoryNotFoundException">Thrown when the specified directory does not exist</exception>
-    public static void CreateBuildPropsFile(string conversionPath)
+    private static void CreateBuildPropsFile(string conversionPath)
     {
         if (conversionPath is null)
             throw new ArgumentNullException(nameof(conversionPath));
