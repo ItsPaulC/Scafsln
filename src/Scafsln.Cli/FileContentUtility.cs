@@ -1,3 +1,5 @@
+using Scafsln.Cli.Services;
+
 namespace Scafsln.Cli;
 
 /// <summary>
@@ -5,6 +7,10 @@ namespace Scafsln.Cli;
 /// </summary>
 public static class FileContentUtility
 {
+    private const string AssetPathName = "Assets";
+    private const string GitignoreTemplateName = "gitignore-template";
+    private const string EditorConfigTemplateName = "editorconfig-template";
+
     /// <summary>
     /// Gets the default .gitignore content for .NET projects
     /// </summary>
@@ -25,7 +31,18 @@ public static class FileContentUtility
     /// <exception cref="IOException">Thrown when there's an error creating the Templates directory or saving the file</exception>
     public static void UpdateGitIgnoreContent(string sourcePath)
     {
-        UpdateTemplateContent(sourcePath, "gitignore-template");
+        ArgumentException.ThrowIfNullOrWhiteSpace(sourcePath);
+
+        if (!File.Exists(sourcePath))
+        {
+            throw new FileNotFoundException($"File not found: {sourcePath}");
+        }
+
+        // Read the contents from the provided file and update in database
+        string content = File.ReadAllText(sourcePath);
+        
+        using var service = new TemplateService();
+        service.UpdateGitignoreTemplateAsync(content).GetAwaiter().GetResult();
     }
 
     /// <summary>
@@ -38,77 +55,64 @@ public static class FileContentUtility
     /// <exception cref="IOException">Thrown when there's an error creating the Templates directory or saving the file</exception>
     public static void UpdateEditorconfigContent(string sourcePath)
     {
-        UpdateTemplateContent(sourcePath, "editorconfig-template");
+        ArgumentException.ThrowIfNullOrWhiteSpace(sourcePath);
+
+        if (!File.Exists(sourcePath))
+        {
+            throw new FileNotFoundException($"File not found: {sourcePath}");
+        }
+
+        // Read the contents from the provided file and update in database
+        string content = File.ReadAllText(sourcePath);
+        
+        using var service = new TemplateService();
+        service.UpdateEditorConfigTemplateAsync(content).GetAwaiter().GetResult();
     }
 
     /// <summary>
-    /// Resets the template files by deleting them, which will cause the system to use default templates
+    /// Resets the template files to their default content
     /// </summary>
     public static void Reset()
     {
-        string templatesDir = Path.Combine(AppContext.BaseDirectory, "Templates");
-        string gitignoreTemplate = Path.Combine(templatesDir, "gitignore-template");
-        string editorconfigTemplate = Path.Combine(templatesDir, "editorconfig-template");
-
-        if (File.Exists(gitignoreTemplate))
-        {
-            File.Delete(gitignoreTemplate);
-        }
-
-        if (File.Exists(editorconfigTemplate))
-        {
-            File.Delete(editorconfigTemplate);
-        }
+        using var service = new TemplateService();
+        service.ResetTemplatesAsync().GetAwaiter().GetResult();
     }
 
+    /// <summary>
+    /// Loads the .gitignore template content from the database or default content
+    /// </summary>
+    /// <returns>The .gitignore template content</returns>
     private static string LoadGitIgnoreTemplate()
-    {
-        return LoadTemplateContent("gitignore-template", FileContents.GitIgnoreContent);
-    }
-
-    private static string LoadEditorconfigTemplate()
-    {
-        return LoadTemplateContent("editorconfig-template", FileContents.EditorConfigContent);
-    }
-
-    private static string LoadTemplateContent(string templateFileName, string defaultContent)
     {
         try
         {
-            string templatePath = Path.Combine(AppContext.BaseDirectory, "Templates", templateFileName);
-            if (File.Exists(templatePath))
-            {
-                return File.ReadAllText(templatePath);
-            }
+            using var service = new TemplateService();
+            var template = service.GetTemplateContentAsync().GetAwaiter().GetResult();
+            return template?.GitignoreTemplate ?? FileContents.GitIgnoreContent;
         }
-        catch (IOException)
+        catch (Exception ex)
         {
-            // If there's any IO error, fall back to the default content
+            Console.Error.WriteLine($"Error loading .gitignore template: {ex.Message}");
+            return FileContents.GitIgnoreContent;
         }
-
-        return defaultContent;
     }
 
-    private static void UpdateTemplateContent(string sourcePath, string templateFileName)
+    /// <summary>
+    /// Loads the .editorconfig template content from the database or default content
+    /// </summary>
+    /// <returns>The .editorconfig template content</returns>
+    private static string LoadEditorconfigTemplate()
     {
-        if (sourcePath is null)
-            throw new ArgumentNullException(nameof(sourcePath));
-
-        if (string.IsNullOrWhiteSpace(sourcePath))
-            throw new ArgumentException("Path cannot be empty or whitespace", nameof(sourcePath));
-
-        if (!File.Exists(sourcePath))
-            throw new FileNotFoundException($"File not found: {sourcePath}");
-
-        // Read the contents of the provided file
-        string content = File.ReadAllText(sourcePath);
-
-        // Create Templates directory if it doesn't exist
-        string templatesDir = Path.Combine(AppContext.BaseDirectory, "Templates");
-        Directory.CreateDirectory(templatesDir);
-
-        // Save the content to the template file
-        string templatePath = Path.Combine(templatesDir, templateFileName);
-        File.WriteAllText(templatePath, content);
+        try
+        {
+            using var service = new TemplateService();
+            var template = service.GetTemplateContentAsync().GetAwaiter().GetResult();
+            return template?.EditorconfigTemplate ?? FileContents.EditorConfigContent;
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error loading .editorconfig template: {ex.Message}");
+            return FileContents.EditorConfigContent;
+        }
     }
 }

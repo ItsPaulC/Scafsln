@@ -61,4 +61,11 @@ public class FileContentsUtilityTests
         // Assert that the reset content matches the initial content
         Assert.Equal(initialContent, resetContent);
     }
+
+    [Fact]
+    public void xxxx()
+    {
+       string newConfigPath = "c:\\temp\\.editorconfig";
+         FileContentUtility.UpdateEditorconfigContent(newConfigPath);
+    }
 }

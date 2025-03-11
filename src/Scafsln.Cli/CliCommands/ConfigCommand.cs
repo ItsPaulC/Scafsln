@@ -18,7 +18,7 @@ public class ConfigCommand : Command<ConfigCommand.ConfigSettings>
 
         [CommandOption("--change-editorconfig")]
         [Description("Change the .editorconfig file")]
-        public string? NewEditorconfig { get; set; }
+        public string? NewEditorconfigPath { get; set; }
 
         [CommandOption("--change-gitignore")]
         [Description("Change the .gitignore file")]
@@ -35,7 +35,7 @@ public class ConfigCommand : Command<ConfigCommand.ConfigSettings>
         public override ValidationResult Validate()
         {
             // Only validate path if we're doing an operation that requires it
-            if (NewEditorconfig != null || NewGitignore != null)
+            if (NewEditorconfigPath != null || NewGitignore != null)
             {
                 if (string.IsNullOrWhiteSpace(Path))
                 {
@@ -48,9 +48,9 @@ public class ConfigCommand : Command<ConfigCommand.ConfigSettings>
                 }
             }
 
-            if (NewEditorconfig != null && !File.Exists(NewEditorconfig))
+            if (NewEditorconfigPath != null && !File.Exists(NewEditorconfigPath))
             {
-                return ValidationResult.Error($"Editor config file {NewEditorconfig} does not exist.");
+                return ValidationResult.Error($"Editor config file {NewEditorconfigPath} does not exist.");
             }
 
             if (NewGitignore != null && !File.Exists(NewGitignore))
@@ -87,11 +87,11 @@ public class ConfigCommand : Command<ConfigCommand.ConfigSettings>
             AnsiConsole.WriteLine(FileContentUtility.EditorConfigContent);
         }
 
-        if (settings.NewEditorconfig != null)
+        if (settings.NewEditorconfigPath != null)
         {
             try
             {
-                FileContentUtility.UpdateEditorconfigContent(settings.NewEditorconfig);
+                FileContentUtility.UpdateEditorconfigContent(settings.NewEditorconfigPath);
                 AnsiConsole.MarkupLine("[green]Successfully saved new .editorconfig template[/]");
             }
             catch (Exception ex)
@@ -105,6 +105,7 @@ public class ConfigCommand : Command<ConfigCommand.ConfigSettings>
         {
             try
             {
+
                 FileContentUtility.UpdateGitIgnoreContent(settings.NewGitignore);
                 AnsiConsole.MarkupLine("[green]Successfully saved new .gitignore template[/]");
             }
@@ -119,7 +120,7 @@ public class ConfigCommand : Command<ConfigCommand.ConfigSettings>
             {
                 ShowGitignore: false,
                 ShowEditorconfig: false,
-                NewEditorconfig: null,
+                NewEditorconfigPath: null,
                 NewGitignore: null,
                 Reset: false
             })
