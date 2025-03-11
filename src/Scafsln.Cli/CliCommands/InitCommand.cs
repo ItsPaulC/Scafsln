@@ -24,15 +24,16 @@ public class InitCommand : Command<InitCommand.InitSettings>
         [Description("Add all configuration files to the solution")]
         public bool UseAll { get; set; }
 
-        [CommandArgument(0, "<path>")]
-        [Description("Path to run init against")]
-        public required string Path { get; set; }
+        [CommandArgument(0, "[path]")]
+        [Description("Path to run init against (defaults to current directory if not specified)")]
+        public string Path { get; set; } = Environment.CurrentDirectory;
 
         public override ValidationResult Validate()
         {
             if (string.IsNullOrWhiteSpace(Path))
             {
-                return ValidationResult.Error("Path must be provided.");
+                Path = Environment.CurrentDirectory;
+                return ValidationResult.Success();
             }
 
             if (!System.IO.Path.IsPathRooted(Path))

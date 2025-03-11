@@ -11,12 +11,13 @@ A .NET CLI tool for initializing and standardizing .NET solution configurations.
 - **Configuration Management**: View and update configuration files with template support
 - **Template Storage**: Persistent storage of templates using SQLite for improved reliability
 - **SemVer Support**: Robust NuGet package version comparison with support for non-standard version formats
+- **Directory Context**: Commands automatically use the current directory when no path is specified
 
 ## Installation
 
 Currently, the tool can be run directly from the source:
 
-```bash
+```powershell
 dotnet run --project Scafsln.Cli/Scafsln.Cli.csproj
 ```
 
@@ -24,9 +25,11 @@ dotnet run --project Scafsln.Cli/Scafsln.Cli.csproj
 
 ### Initialize Solution
 
-```bash
-scafsln init-sln [options] <path>
+```powershell
+scafsln init-sln [options] [path]
 ```
+
+The `path` argument is now optional. If not provided, the command will use the current directory.
 
 #### Init Options
 
@@ -38,7 +41,7 @@ scafsln init-sln [options] <path>
 
 ### Manage Configuration Files
 
-```bash
+```powershell
 scafsln config [options] [path]
 ```
 
@@ -59,33 +62,38 @@ When using the `--change-editorconfig` or `--change-gitignore` options, the prov
 
 ### Example Commands
 
-Initialize with all configuration files:
-```bash
+Initialize with all configuration files in the current directory:
+```powershell
+scafsln init-sln -a
+```
+
+Initialize with all configuration files in a specific directory:
+```powershell
 scafsln init-sln -a "C:\path\to\solution"
 ```
 
-Add only central package management:
-```bash
-scafsln init-sln -c "C:\path\to\solution"
+Add only central package management to current directory:
+```powershell
+scafsln init-sln -c
 ```
 
 Add editor config and gitignore:
-```bash
+```powershell
 scafsln init-sln -e -g "C:\path\to\solution"
 ```
 
 View .gitignore contents:
-```bash
+```powershell
 scafsln config --show-gitignore
 ```
 
 Update .editorconfig template:
-```bash
+```powershell
 scafsln config --change-editorconfig "path\to\template.editorconfig"
 ```
 
 Reset templates to default:
-```bash
+```powershell
 scafsln config --reset
 ```
 
