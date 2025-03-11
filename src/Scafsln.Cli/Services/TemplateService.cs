@@ -37,7 +37,7 @@ public class TemplateService : IDisposable
     /// <returns>A task representing the asynchronous operation</returns>
     public async Task UpdateEditorConfigTemplateAsync(string content)
     {
-        var template = await GetOrCreateTemplateAsync();
+        TemplateFileContent template = await GetOrCreateTemplateAsync();
         template.EditorconfigTemplate = content;
         await _dbContext.SaveChangesAsync();
     }
@@ -49,7 +49,7 @@ public class TemplateService : IDisposable
     /// <returns>A task representing the asynchronous operation</returns>
     public async Task UpdateGitignoreTemplateAsync(string content)
     {
-        var template = await GetOrCreateTemplateAsync();
+        TemplateFileContent template = await GetOrCreateTemplateAsync();
         template.GitignoreTemplate = content;
         await _dbContext.SaveChangesAsync();
     }
@@ -61,7 +61,7 @@ public class TemplateService : IDisposable
     public async Task ResetTemplatesAsync()
     {
         // Get all templates from database
-        var templates = await _dbContext.TemplateContents.ToListAsync();
+        List<TemplateFileContent> templates = await _dbContext.TemplateContents.ToListAsync();
         
         if (templates.Any())
         {
@@ -71,7 +71,7 @@ public class TemplateService : IDisposable
         }
         
         // Add a new template with default values
-        var newTemplate = new TemplateFileContent
+        TemplateFileContent newTemplate = new()
         {
             EditorconfigTemplate = FileContents.EditorConfigContent,
             GitignoreTemplate = FileContents.GitIgnoreContent

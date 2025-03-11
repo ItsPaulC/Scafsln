@@ -1,3 +1,4 @@
+using Scafsln.Cli.Dto;
 using Scafsln.Cli.Services;
 
 namespace Scafsln.Cli;
@@ -7,10 +8,6 @@ namespace Scafsln.Cli;
 /// </summary>
 public static class FileContentUtility
 {
-    private const string AssetPathName = "Assets";
-    private const string GitignoreTemplateName = "gitignore-template";
-    private const string EditorConfigTemplateName = "editorconfig-template";
-
     /// <summary>
     /// Gets the default .gitignore content for .NET projects
     /// </summary>
@@ -41,7 +38,7 @@ public static class FileContentUtility
         // Read the contents from the provided file and update in database
         string content = File.ReadAllText(sourcePath);
         
-        using var service = new TemplateService();
+        using TemplateService service = new();
         service.UpdateGitignoreTemplateAsync(content).GetAwaiter().GetResult();
     }
 
@@ -65,7 +62,7 @@ public static class FileContentUtility
         // Read the contents from the provided file and update in database
         string content = File.ReadAllText(sourcePath);
         
-        using var service = new TemplateService();
+        using TemplateService service = new();
         service.UpdateEditorConfigTemplateAsync(content).GetAwaiter().GetResult();
     }
 
@@ -74,7 +71,7 @@ public static class FileContentUtility
     /// </summary>
     public static void Reset()
     {
-        using var service = new TemplateService();
+        using TemplateService service = new();
         service.ResetTemplatesAsync().GetAwaiter().GetResult();
     }
 
@@ -87,7 +84,7 @@ public static class FileContentUtility
         try
         {
             using var service = new TemplateService();
-            var template = service.GetTemplateContentAsync().GetAwaiter().GetResult();
+            TemplateFileContent? template = service.GetTemplateContentAsync().GetAwaiter().GetResult();
             return template?.GitignoreTemplate ?? FileContents.GitIgnoreContent;
         }
         catch (Exception ex)
@@ -106,7 +103,7 @@ public static class FileContentUtility
         try
         {
             using var service = new TemplateService();
-            var template = service.GetTemplateContentAsync().GetAwaiter().GetResult();
+            TemplateFileContent? template = service.GetTemplateContentAsync().GetAwaiter().GetResult();
             return template?.EditorconfigTemplate ?? FileContents.EditorConfigContent;
         }
         catch (Exception ex)
