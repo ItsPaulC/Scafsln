@@ -9,6 +9,8 @@ A .NET CLI tool for initializing and standardizing .NET solution configurations.
 - **Editor Configuration**: Enforces consistent coding styles through `.editorconfig`
 - **Git Integration**: Provides standard `.gitignore` for .NET projects
 - **Configuration Management**: View and update configuration files with template support
+- **Template Storage**: Persistent storage of templates using SQLite for improved reliability
+- **SemVer Support**: Robust NuGet package version comparison with support for non-standard version formats
 
 ## Installation
 
@@ -52,7 +54,7 @@ Path is only required when using the change commands.
 - `-h|--help`: Show help and usage information
 
 When using the `--change-editorconfig` or `--change-gitignore` options, the provided file will be:
-- Saved as a template for future use
+- Saved as a template in the SQLite database for persistent storage
 - Used as the default content for future operations
 
 ### Example Commands
@@ -93,6 +95,7 @@ scafsln config --reset
 - Implements [Central Package Management](https://learn.microsoft.com/en-us/nuget/consume-packages/central-package-management)
 - Consolidates package versions across projects
 - Automatically detects and uses highest package versions
+- Handles complex NuGet version formats and SemVer specifications
 
 ### Directory.Build.props
 - Automatically created when using the CPM option
@@ -112,6 +115,14 @@ scafsln config --reset
 - Ignores IDE-specific files
 - Handles NuGet package directories
 - Excludes sensitive files (*.user, *.pfx)
+
+## Technical Implementation
+
+- Built with .NET 8 for cross-platform compatibility
+- SQLite database for persistent template storage
+- Entity Framework Core for database operations
+- Asynchronous API design for improved performance
+- Robust error handling throughout
 
 ## Requirements
 
