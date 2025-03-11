@@ -59,7 +59,7 @@ public static class ProjectPrepUtility
                     var nonConstrainedVersions = kvp.Value.Where(p => !p.HasVersionConstraint);
                     return nonConstrainedVersions.Any()
                         ? nonConstrainedVersions
-                            .OrderByDescending(p => new Version(p.Version))
+                            .OrderByDescending(p => p.Version, new NuGetVersionComparer())
                             .First()
                             .Version
                         : null;
@@ -89,8 +89,8 @@ public static class ProjectPrepUtility
 """;
 
         File.WriteAllText(packagesPropsPath, content);
-
-        // Call CreateBuildPropsFile to create Directory.Build.props
+        
+        // Create Directory.Build.props file
         CreateBuildPropsFile(conversionPath);
     }
 
@@ -118,7 +118,6 @@ public static class ProjectPrepUtility
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>Nullable</WarningsAsErrors>
-        <ImplicitUsings>enable</ImplicitUsings>
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
 
@@ -243,6 +242,97 @@ public static class ProjectPrepUtility
         if (modified)
         {
             doc.Save(projectPath);
+        }
+    }
+
+    /// <summary>
+    /// Custom comparer for NuGet package versions that handles non-standard version formats
+    /// </summary>
+    private class NuGetVersionComparer : IComparer<string>
+    {
+        private static readonly Regex SemVerRegex = new(@"^(\d+)(?:\.(\d+))?(?:\.(\d+))?(?:\.(\d+))?(?:-([0-9A-Za-z-.]+))?(?:\+([0-9A-Za-z-.]+))?$");
+
+        public int Compare(string? x, string? y)
+        {
+            if (x == y) return 0;
+            if (x == null) return -1;
+            if (y == null) return 1;
+
+            // Clean up version strings (remove any build metadata)
+            string vx = x.Contains('+') ? x.Substring(0, x.IndexOf('+')) : x;
+            string vy = y.Contains('+') ? y.Substring(0, y.IndexOf('+')) : y;
+
+            // Try parsing versions as standard versions
+            bool xIsStandard = TryParseStandardVersion(vx, out Version? versionX);
+            bool yIsStandard = TryParseStandardVersion(vy, out Version? versionY);
+
+            // If both are standard versions, compare them
+            if (xIsStandard && yIsStandard && versionX != null && versionY != null)
+            {
+                return versionX.CompareTo(versionY);
+            }
+
+            // If one is standard and one isn't, standard is higher
+            if (xIsStandard != yIsStandard)
+            {
+                return xIsStandard ? 1 : -1;
+            }
+
+            // If neither are standard, try semantic versioning approach
+            Match matchX = SemVerRegex.Match(vx);
+            Match matchY = SemVerRegex.Match(vy);
+
+            if (matchX.Success && matchY.Success)
+            {
+                // Compare major, minor, patch, revision
+                for (int i = 1; i <= 4; i++)
+                {
+                    int numX = int.TryParse(matchX.Groups[i].Value, out int x1) ? x1 : 0;
+                    int numY = int.TryParse(matchY.Groups[i].Value, out int y1) ? y1 : 0;
+                    
+                    if (numX != numY)
+                    {
+                        return numX.CompareTo(numY);
+                    }
+                }
+
+                // Compare pre-release labels (no pre-release > has pre-release)
+                bool hasPreReleaseX = matchX.Groups[5].Success;
+                bool hasPreReleaseY = matchY.Groups[5].Success;
+
+                if (hasPreReleaseX != hasPreReleaseY)
+                {
+                    return hasPreReleaseX ? -1 : 1;
+                }
+
+                if (hasPreReleaseX && hasPreReleaseY)
+                {
+                    return string.Compare(matchX.Groups[5].Value, matchY.Groups[5].Value, StringComparison.OrdinalIgnoreCase);
+                }
+            }
+
+            // Last resort: string comparison
+            return string.Compare(vx, vy, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private bool TryParseStandardVersion(string versionString, out Version? version)
+        {
+            // Remove any pre-release suffix for standard version parsing
+            if (versionString.Contains('-'))
+            {
+                versionString = versionString.Substring(0, versionString.IndexOf('-'));
+            }
+
+            try
+            {
+                version = new Version(versionString);
+                return true;
+            }
+            catch
+            {
+                version = null;
+                return false;
+            }
         }
     }
 }
