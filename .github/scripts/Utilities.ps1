@@ -46,5 +46,5 @@ function Find-FileUpwards {
     return $null
 }
 
-# Export the function to make it available when the script is dot-sourced
-Export-ModuleMember -Function Find-FileUpwards
+# Export-ModuleMember is only valid in .psm1 module files, not in .ps1 script files
+# When the script is dot-sourced, all functions are automatically available to the calling script
