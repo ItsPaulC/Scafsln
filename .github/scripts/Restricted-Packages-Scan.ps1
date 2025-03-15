@@ -45,92 +45,6 @@ $restrictedPackages = @(
     }
 )
 
-#region Functions
-
-function Find-CsprojFiles {
-    param(
-        [string]$startDir
-    )
-    
-    return Get-ChildItem -Path $startDir -Filter "*.csproj" -Recurse -ErrorAction SilentlyContinue
-}
-
-<#
-.SYNOPSIS
-    Creates an ASCII table from the provided data.
-.DESCRIPTION
-    Formats a collection of objects into a readable ASCII table with columns and borders.
-#>
-function Format-TableOutput {
-    param(
-        [Parameter(Mandatory=$true)]
-        [PSObject[]]$Data,
-        
-        [Parameter(Mandatory=$true)]
-        [string]$Title,
-        
-        [Parameter(Mandatory=$false)]
-        [System.ConsoleColor]$TitleColor = [System.ConsoleColor]::White,
-        
-        [Parameter(Mandatory=$false)]
-        [System.ConsoleColor]$RowColor = [System.ConsoleColor]::White
-    )
-    
-    if ($Data.Count -eq 0) {
-        return
-    }
-    
-    Write-Host ("`n" + $Title + ":") -ForegroundColor $TitleColor
-    
-    # Get all property names
-    $properties = $Data[0].PSObject.Properties.Name
-    
-    # Calculate column widths
-    $columnWidths = @{}
-    foreach ($prop in $properties) {
-        $headerLength = $prop.Length
-        $maxDataLength = ($Data | ForEach-Object { 
-            if ($null -eq $_.$prop) {
-                0  # Handle null values
-            } else {
-                $_.$prop.ToString().Length
-            }
-        } | Measure-Object -Maximum).Maximum
-        $columnWidths[$prop] = [Math]::Max($headerLength, $maxDataLength) + 2
-    }
-    
-    # Create header border
-    $headerBorder = "+"
-    foreach ($prop in $properties) {
-        $headerBorder += ("-" * $columnWidths[$prop]) + "+"
-    }
-    
-    # Create header row
-    $headerRow = "|"
-    foreach ($prop in $properties) {
-        $headerRow += " " + $prop.PadRight($columnWidths[$prop] - 2) + " |"
-    }
-    
-    # Output header
-    Write-Host $headerBorder
-    Write-Host $headerRow
-    Write-Host $headerBorder
-    
-    # Output rows
-    foreach ($item in $Data) {
-        $row = "|"
-        foreach ($prop in $properties) {
-            $value = if ($null -eq $item.$prop) { "∞" } else { $item.$prop.ToString() }
-            $row += " " + $value.PadRight($columnWidths[$prop] - 2) + " |"
-        }
-        Write-Host $row -ForegroundColor $RowColor
-    }
-    
-    # Output footer
-    Write-Host $headerBorder
-}
-
-#endregion Functions
 
 #region Main Script
 
@@ -165,7 +79,7 @@ if (-not (Test-Path -Path $newSolutionPath)) {
 }
 
 # Find all .csproj files in subdirectories
-$csprojFiles = Find-CsprojFiles -startDir $initialDirectory
+$csprojFiles = Get-ChildItem -Path $initialDirectory -Filter "*.csproj" -Recurse -ErrorAction SilentlyContinue
 $csprojFilePaths = $csprojFiles.FullName
 
 if ($csprojFiles.Count -eq 0) {
@@ -211,14 +125,13 @@ else {
         }
     }
 
-    # Display packages in table format using the function
+    # Display packages in table format using the function from Utilities.ps1
     Format-TableOutput -Data $foundPackages -Title "Found Package References" -TitleColor Cyan
 
-    # Display resticted packages
-    Format-TableOutput -Data $restrictedPackages -Title "Searching the code for the following restriced packates" -TitleColor Cyan
+    # Display restricted packages
+    Format-TableOutput -Data $restrictedPackages -Title "Searching the code for the following restricted packages" -TitleColor Cyan
 
     # Find Restricted Packages in the solution
-
     $foundRestrictedPackages = [System.Collections.Generic.List[PSObject]]::new()
 
     foreach ($restrictedPackage in $restrictedPackages) {
