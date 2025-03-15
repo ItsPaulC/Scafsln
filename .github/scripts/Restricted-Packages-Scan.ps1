@@ -2,7 +2,18 @@ param(
     [string]$initialDirectory = (Get-Location).Path
 )
 
-# .\Find-ProjectsAndCreateSolution.ps1 -startDirectory "E:\repos\Samples\TestPowershell\TestPowershell\"
+# Import the utility functions
+$scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
+$utilityScriptPath = Join-Path -Path $scriptPath -ChildPath "Utilities.ps1"
+
+# Check if the utility script exists and source it
+if (-not (Test-Path -Path $utilityScriptPath)) {
+    Write-Error "Required utility script not found: $utilityScriptPath"
+    exit 1
+}
+
+# Dot source the utility script to import the functions
+. $utilityScriptPath
 
 ####################################################################################################
 # Add packages to restrict to the $restrictedPackages array below
@@ -35,40 +46,6 @@ $restrictedPackages = @(
 )
 
 #region Functions
-
-<#
-.SYNOPSIS
-    Finds a file type by looking upwards towards the root.
-.DESCRIPTION
-    Finds file paths by searching upwards, for specified file patterns, from the specified directory towards the root.
-#>
-function Find-FileUpwards {
-    param(
-        [string]$startDir,
-        [string[]]$filePatterns
-    )
-
-    $currentDir = $startDir
-    while ($null -ne $currentDir) {
-        foreach ($pattern in $filePatterns) {
-            # Check the current directory itself for matching files first
-            $foundFiles = Get-ChildItem -Path $currentDir -Filter $pattern -File -ErrorAction SilentlyContinue
-            if ($foundFiles) {
-                return $foundFiles[0].FullName
-            }
-        }
-        
-        # Move up one directory
-        $parentDir = Split-Path -Path $currentDir -Parent
-        if ($parentDir -eq $currentDir) {
-            # We've reached the root
-            return $null
-        }
-        $currentDir = $parentDir
-    }
-    
-    return $null
-}
 
 function Find-CsprojFiles {
     param(
@@ -163,7 +140,7 @@ if (-not (Test-Path -Path $initialDirectory)) {
     exit 1
 }
 
-# Find .slsn or .slnx file searching upwards
+# Find .slsn or .slnx file searching upwards using the imported function
 $solutionFilePatterns = @("*.sln", "*.slnx")
 $existingSolutionFile = Find-FileUpwards -startDir $initialDirectory -filePatterns $solutionFilePatterns
 
