@@ -48,63 +48,16 @@ $restrictedPackages = @(
 
 #region Main Script
 
-# Ensure the start directory exists
-if (-not (Test-Path -Path $initialDirectory)) {
-    Write-Error "The specified start directory '$initialDirectory' does not exist."
-    exit 1
-}
+    ##########
+    New-Solution-FromProjectPath -startDir $initialDirectory
+    #########################
 
-# Find .slsn or .slnx file searching upwards using the imported function
-$solutionFilePatterns = @("*.sln", "*.slnx")
-$existingSolutionFile = Find-FileUpwards -startDir $initialDirectory -filePatterns $solutionFilePatterns
-
-if ($existingSolutionFile) {
-    Write-Host "Found existing solution file: $existingSolutionFile"
-}
-else {
-    Write-Host "No existing solution file found."
-}
-
-# Create new solution with GUID name
-$newSolutionName = [guid]::NewGuid().ToString() + ".sln"
-$newSolutionPath = Join-Path -Path $initialDirectory -ChildPath $newSolutionName
-
-Write-Host "Creating new solution: $newSolutionPath"
-dotnet new sln --name $([System.IO.Path]::GetFileNameWithoutExtension($newSolutionName)) --output $initialDirectory
-
-# Verify the new solution was created
-if (-not (Test-Path -Path $newSolutionPath)) {
-    Write-Error "Failed to create solution file at $newSolutionPath"
-    exit 1
-}
-
-# Find all .csproj files in subdirectories
-$csprojFiles = Get-ChildItem -Path $initialDirectory -Filter "*.csproj" -Recurse -ErrorAction SilentlyContinue
-$csprojFilePaths = $csprojFiles.FullName
-
-if ($csprojFiles.Count -eq 0) {
-    Write-Warning "No .csproj files found in $initialDirectory or its subdirectories."
-}
-else {
-    Write-Host "Found $($csprojFiles.Count) .csproj files."
-    
-    # Add projects to the solution
-    Write-Host "Adding projects to solution..."
-    foreach ($csprojFile in $csprojFilePaths) {
-        Write-Host "  Adding: $csprojFile"
-        dotnet sln $newSolutionPath add $csprojFile | Out-Null
-    }
-    
-    # Restore the solution
-    Write-Host "Restoring solution packages..."
-    dotnet restore $newSolutionPath
-    
     # List packages in the solution and save unique results with "Version"
     Write-Host "Listing packages in the solution..." -ForegroundColor Cyan
     $packages = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
     $foundPackages = [System.Collections.Generic.List[PSObject]]::new()
 
-    $packageListResult = dotnet list $newSolutionPath package
+    $packageListResult = dotnet list $global:ScanSolutionPath package
 
     foreach ($line in $packageListResult) {
         # Check if line starts with '>' (after any whitespace)

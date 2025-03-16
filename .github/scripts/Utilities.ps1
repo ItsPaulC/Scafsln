@@ -131,4 +131,86 @@ function Format-TableOutput {
     Write-Host $headerBorder
 }
 
+function New-Solution-FromProjectPath
+{
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$startDir
+    )
+
+    # If $global:ScanSolutionPath is not null, then a solution has already been created. Return the value
+    if ($global:ScanSolutionPath)
+    {
+        Write-Host "Solution already created at $global:ScanSolutionPath"
+        return
+    }
+
+
+    # Ensure the start directory exists
+    if (-not (Test-Path -Path $initialDirectory))
+    {
+        Write-Error "The specified start directory '$initialDirectory' does not exist."
+        exit 1
+    }
+
+    # Find .slsn or .slnx file searching upwards using the imported function
+    $solutionFilePatterns = @("*.sln", "*.slnx")
+    $existingSolutionFile = Find-FileUpwards -startDir $initialDirectory -filePatterns $solutionFilePatterns
+
+    if ($existingSolutionFile)
+    {
+        Write-Host "Found existing solution file: $existingSolutionFile"
+    }
+    else
+    {
+        Write-Host "No existing solution file found."
+    }
+
+    # Create new solution with GUID name
+    $newSolutionName = [guid]::NewGuid().ToString() + ".sln"
+    $newSolutionPath = Join-Path -Path $initialDirectory -ChildPath $newSolutionName
+
+    Write-Host "Creating new solution: $newSolutionPath"
+    dotnet new sln --name $([System.IO.Path]::GetFileNameWithoutExtension($newSolutionName) ) --output $initialDirectory
+
+    # Verify the new solution was created
+    if (-not (Test-Path -Path $newSolutionPath))
+    {
+        Write-Error "Failed to create solution file at $newSolutionPath"
+        exit 1
+    }
+
+    # Find all .csproj files in subdirectories
+    $csprojFiles = Get-ChildItem -Path $initialDirectory -Filter "*.csproj" -Recurse -ErrorAction SilentlyContinue
+    $csprojFilePaths = $csprojFiles.FullName
+
+    if ($csprojFiles.Count -eq 0)
+    {
+        Write-Warning "No .csproj files found in $initialDirectory or its subdirectories."
+    }
+    else
+    {
+        Write-Host "Found $( $csprojFiles.Count ) .csproj files."
+
+        # Add projects to the solution
+        Write-Host "Adding projects to solution..."
+        foreach ($csprojFile in $csprojFilePaths)
+        {
+            Write-Host "  Adding: $csprojFile"
+            dotnet sln $newSolutionPath add $csprojFile | Out-Null
+        }
+
+        # Restore the solution
+        Write-Host "Restoring solution packages..."
+        dotnet restore $newSolutionPath
+
+        # Create a global variable that can be accessed by other scripts
+        $global:ScanSolutionPath = $newSolutionPath
+
+        # Write the new solution path to the Environment Variable for the other steps to use
+#        Write-Host "##vso[task.setvariable variable=ScanSolutionPath]$newSolutionPath"
+
+    }
+}
+
 # When the script is dot-sourced, all functions are automatically available to the calling script
