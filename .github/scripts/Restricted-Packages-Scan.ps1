@@ -1,6 +1,7 @@
-param(
-    [string]$initialDirectory = (Get-Location).Path
-)
+# param(
+#     [string]$initialDirectory = (Get-Location).Path
+# )
+$initialDirectory = 'E:\repos\SlnPrep\src\Scafsln.Cli'
 
 # Import the utility functions
 $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -49,7 +50,12 @@ $restrictedPackages = @(
 #region Main Script
 
     ##########
-    $slnPath = New-Solution-FromProjectPath -startDir $initialDirectory
+    # Capture just the string return value
+    $slnPath = (New-Solution-FromProjectPath -startDir $initialDirectory).Trim()
+    
+    # If you receive an array, you can select the last element which is likely the actual path
+    # Uncomment the following line if the above approach doesn't work
+    # $slnPath = @(New-Solution-FromProjectPath -startDir $initialDirectory)[-1].Trim()
     #########################
 
     # List packages in the solution and save unique results with "Version"
