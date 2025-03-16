@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{D13AE943-B8E3-4448-8448-B239B8A42E83}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{090A1F66-7E14-4C3D-BF4A-605C10CE1A93}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scafsln.Cli", "src\Scafsln.Cli\Scafsln.Cli.csproj", "{A3E01E23-36D6-4B97-A2E5-3384F698B4BB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scafsln.Cli.Tests", "tests\Scafsln.Cli.Tests\Scafsln.Cli.Tests.csproj", "{3DAAB6CC-1842-4B6C-B6D2-0E48C4B853AD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A3E01E23-36D6-4B97-A2E5-3384F698B4BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3E01E23-36D6-4B97-A2E5-3384F698B4BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3E01E23-36D6-4B97-A2E5-3384F698B4BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3E01E23-36D6-4B97-A2E5-3384F698B4BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DAAB6CC-1842-4B6C-B6D2-0E48C4B853AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DAAB6CC-1842-4B6C-B6D2-0E48C4B853AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DAAB6CC-1842-4B6C-B6D2-0E48C4B853AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DAAB6CC-1842-4B6C-B6D2-0E48C4B853AD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A3E01E23-36D6-4B97-A2E5-3384F698B4BB} = {D13AE943-B8E3-4448-8448-B239B8A42E83}
+		{3DAAB6CC-1842-4B6C-B6D2-0E48C4B853AD} = {090A1F66-7E14-4C3D-BF4A-605C10CE1A93}
+	EndGlobalSection
+EndGlobal
