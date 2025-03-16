@@ -62,10 +62,10 @@ public class FileContentsUtilityTests
         Assert.Equal(initialContent, resetContent);
     }
 
-    [Fact]
-    public void xxxx()
-    {
-       string newConfigPath = "c:\\temp\\.editorconfig";
-         FileContentUtility.UpdateEditorconfigContent(newConfigPath);
-    }
+    // [Fact]
+    // public void xxxx()
+    // {
+    //    string newConfigPath = "c:\\temp\\.editorconfig";
+    //      FileContentUtility.UpdateEditorconfigContent(newConfigPath);
+    // }
 }
