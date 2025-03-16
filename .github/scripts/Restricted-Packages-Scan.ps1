@@ -1,7 +1,6 @@
-# param(
-#     [string]$initialDirectory = (Get-Location).Path
-# )
-$initialDirectory = 'E:\repos\SlnPrep\src\Scafsln.Cli'
+ param(
+     [string]$initialDirectory = (Get-Location).Path
+ )
 
 # Import the utility functions
 $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
