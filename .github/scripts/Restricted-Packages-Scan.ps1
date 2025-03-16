@@ -117,6 +117,9 @@ $restrictedPackages = @(
     # Display restricted packages if any were found
     if ($foundRestrictedPackages.Count -gt 0) {
         Format-TableOutput -Data $foundRestrictedPackages -Title "Restricted Packages Found!" -TitleColor Red -RowColor Yellow
+
+          # Fail the build becasue Restricted Packages were found
+          exit 1
     }
     else {
         Write-Host "No restricted packages found."
