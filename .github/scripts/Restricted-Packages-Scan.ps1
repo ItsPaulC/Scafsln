@@ -49,7 +49,7 @@ $restrictedPackages = @(
 #region Main Script
 
     ##########
-    New-Solution-FromProjectPath -startDir $initialDirectory
+    $slnPath = New-Solution-FromProjectPath -startDir $initialDirectory
     #########################
 
     # List packages in the solution and save unique results with "Version"
@@ -57,7 +57,7 @@ $restrictedPackages = @(
     $packages = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
     $foundPackages = [System.Collections.Generic.List[PSObject]]::new()
 
-    $packageListResult = dotnet list $global:ScanSolutionPath package
+    $packageListResult = dotnet list $slnPath package
 
     foreach ($line in $packageListResult) {
         # Check if line starts with '>' (after any whitespace)

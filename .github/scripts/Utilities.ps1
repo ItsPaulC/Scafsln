@@ -142,7 +142,7 @@ function New-Solution-FromProjectPath
     if ($global:ScanSolutionPath)
     {
         Write-Host "Solution already created at $global:ScanSolutionPath"
-        return
+        return $global:ScanSolutionPath
     }
 
 
@@ -211,6 +211,8 @@ function New-Solution-FromProjectPath
 #        Write-Host "##vso[task.setvariable variable=ScanSolutionPath]$newSolutionPath"
 
     }
+    
+    return $global:ScanSolutionPath
 }
 
 # When the script is dot-sourced, all functions are automatically available to the calling script
