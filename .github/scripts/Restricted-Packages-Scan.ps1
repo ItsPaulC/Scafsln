@@ -22,7 +22,7 @@ if (-not (Test-Path -Path $utilityScriptPath)) {
 # To restrict a version you can do a min/max range, or just a min or max by setting the other to $null
 # To restrict a version to a single version, set both min and max to the same version
 
-# Examples: 
+# Examples:
 # MinVersion       - MaxVersion       - Description
 # [version]"7.2.0" - [version]"7.2.0" - 7.2.0 only
 # [version]"7.2.0" - [version]"7.3.0" - 7.2.0 to 7.3.0
@@ -65,12 +65,12 @@ $restrictedPackages = @(
             $packageName = $matches[1].Trim()
             # The last version is the one we want (target version)
             $version = $matches[3].Trim()
-            
+
             $foundPackages.Add([PSCustomObject]@{
                 PackageName = $packageName
                 Version = $version
             })
-            
+
             [void]$packages.Add("$packageName $version")
         }
         elseif ($line -match "version" -or $line -match "Version") {
@@ -104,7 +104,7 @@ $restrictedPackages = @(
                     PackageName = $foundPackage.PackageName
                     Version = $foundPackage.Version
                     Restriction = "Package '$($foundPackage.PackageName)' version $($foundPackage.Version) is greater than the maximum allowed version $($restrictedPackage.MaxVersion)."
-                    })            
+                    })
             }
         }
     }
@@ -116,11 +116,5 @@ $restrictedPackages = @(
     else {
         Write-Host "No restricted packages found."
     }
-}
-
-# Delete the temp sln file
-Remove-Item $newSolutionPath
 
 #endregion Main Script
-
-
