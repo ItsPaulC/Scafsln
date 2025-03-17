@@ -131,37 +131,37 @@ function Format-TableOutput {
     Write-Host $headerBorder
 }
 
-function New-Solution-FromProjectPath
-{
+<#
+.SYNOPSIS
+    Creates a new solution file and adds projects to it.
+.DESCRIPTION
+    Creates a new solution file at the specified location or uses an existing one.
+    Finds all .csproj files in the directory and adds them to the solution.
+.PARAMETER startDir
+    The directory to start from.
+.OUTPUTS
+    System.String. The full path of the solution file.
+#>
+function New-Solution-FromProjectPath {
     param(
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory=$true)]
         [string]$startDir
     )
 
-    # # If $global:ScanSolutionPath is not null, then a solution has already been created. Return the value
-    # if ($global:ScanSolutionPath)
-    # {
-    #     Write-Host "Solution already created at $global:ScanSolutionPath"
-    #     return $global:ScanSolutionPath
-    # }
-
     # Ensure the start directory exists
-    if (-not (Test-Path -Path $initialDirectory))
-    {
-        Write-Error "The specified start directory '$initialDirectory' does not exist."
+    if (-not (Test-Path -Path $startDir)) {
+        Write-Error "The specified start directory '$startDir' does not exist."
         exit 1
     }
 
-    # Find .slsn or .slnx file searching upwards using the imported function
+    # Find .sln or .slnx file searching upwards using the imported function
     $solutionFilePatterns = @("*.sln", "*.slnx")
-    $existingSolutionFile = Find-FileUpwards -startDir $initialDirectory -filePatterns $solutionFilePatterns
+    $existingSolutionFile = Find-FileUpwards -startDir $startDir -filePatterns $solutionFilePatterns
 
-    if ($existingSolutionFile)
-    {
+    if ($existingSolutionFile) {
         Write-Host "Found existing solution file: $existingSolutionFile"
     }
-    else
-    {
+    else {
         Write-Host "No existing solution file found."
     }
 
@@ -182,28 +182,24 @@ function New-Solution-FromProjectPath
     $null = dotnet new sln --name $([System.IO.Path]::GetFileNameWithoutExtension($newSolutionName)) --output $solutionDirectory
 
     # Verify the new solution was created
-    if (-not (Test-Path -Path $newSolutionPath))
-    {
+    if (-not (Test-Path -Path $newSolutionPath)) {
         Write-Error "Failed to create solution file at $newSolutionPath"
         exit 1
     }
 
     # Find all .csproj files in subdirectories
-    $csprojFiles = Get-ChildItem -Path $initialDirectory -Filter "*.csproj" -Recurse -ErrorAction SilentlyContinue
+    $csprojFiles = Get-ChildItem -Path $startDir -Filter "*.csproj" -Recurse -ErrorAction SilentlyContinue
     $csprojFilePaths = $csprojFiles.FullName
 
-    if ($csprojFiles.Count -eq 0)
-    {
-        Write-Warning "No .csproj files found in $initialDirectory or its subdirectories."
+    if ($csprojFiles.Count -eq 0) {
+        Write-Warning "No .csproj files found in $startDir or its subdirectories."
     }
-    else
-    {
+    else {
         Write-Host "Found $($csprojFiles.Count) .csproj files."
 
         # Add projects to the solution
         Write-Host "Adding projects to solution..."
-        foreach ($csprojFile in $csprojFilePaths)
-        {
+        foreach ($csprojFile in $csprojFilePaths) {
             Write-Host "  Adding: $csprojFile"
             $null = dotnet sln $newSolutionPath add $csprojFile
         }
@@ -220,4 +216,18 @@ function New-Solution-FromProjectPath
     return $newSolutionPath
 }
 
+function Pre-Scan-Setup {
+    $global:ScanSolutionPath = $null
+    
+}
+
+function Post-Scan-Teardown {
+    if ($global:ScanSolutionPath -and (Test-Path -Path $global:ScanSolutionPath)) {
+        Write-Host "Cleaning up solution file..."
+        Remove-Item -Path $global:ScanSolutionPath -Force
+    }
+    
+    # Clear the global variable
+    $global:ScanSolutionPath = $null
+}
 # When the script is dot-sourced, all functions are automatically available to the calling script
