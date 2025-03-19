@@ -10,7 +10,7 @@ on:
 jobs:
   package-scan:
     name: Check for Package Vulnerabilities
-    uses: ./.github/workflows/jobs/package-scan.yaml
+    uses: ./.github/workflows/package-scan.yaml
     with:
       working-directory: ${{ github.workspace }}
 
