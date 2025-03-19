@@ -8,21 +8,15 @@ on:
   workflow_dispatch:
 
 jobs:
-  restricted-package-scan:
-    name: Check for Restricted Packages
-    uses: ./.github/workflows/restricted-package-scan.yaml
-    with:
-      working-directory: ${{ github.workspace }}
-
-  cve-scan:
-    name: Check for CVE Vulnerabilities
-    uses: ./.github/workflows/cve-scan.yaml
+  package-scan:
+    name: Check for Package Vulnerabilities
+    uses: ./.github/workflows/package-scan.yaml
     with:
       working-directory: ${{ github.workspace }}
 
   build:
     name: Build and Test
-    needs: [restricted-package-scan, cve-scan]
+    needs: [package-scan]
     runs-on: windows-latest
 
     steps:

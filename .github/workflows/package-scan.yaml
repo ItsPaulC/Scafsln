@@ -1,0 +1,72 @@
+name: Package Vulnerability Scan
+
+on:
+  workflow_call:
+    inputs:
+      working-directory:
+        description: 'Directory to scan for package vulnerabilities'
+        required: false
+        type: string
+        default: '.'
+    outputs:
+      vulnerabilities-found:
+        description: 'Whether high/critical vulnerabilities were found'
+        value: ${{ jobs.scan.outputs.vulnerabilities-found }}
+
+jobs:
+  scan:
+    name: Scan for Package Vulnerabilities
+    runs-on: windows-latest
+    outputs:
+      vulnerabilities-found: ${{ steps.scan-cves.outputs.vulnerabilities-found }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Pre-Scan Setup
+        id: pre-scan
+        shell: pwsh
+        working-directory: ${{ inputs.working-directory }}
+        run: |
+          $scriptPath = ".github/scripts/Utilities.ps1"
+          . $scriptPath
+          Pre-Scan-Setup
+      
+      - name: Run Deprecated Packages Scan
+        id: scan-deprecated
+        shell: pwsh
+        working-directory: ${{ inputs.working-directory }}
+        run: |
+          $scriptPath = ".github/scripts/Deprecated-Scan.ps1"
+          & $scriptPath -initialDirectory $pwd
+          
+      - name: Run Restricted Packages Scan
+        id: scan-restricted
+        shell: pwsh
+        working-directory: ${{ inputs.working-directory }}
+        run: |
+          $scriptPath = ".github/scripts/Restricted-Packages-Scan.ps1"
+          & $scriptPath -initialDirectory $pwd
+
+      - name: Run Package CVE Scan
+        id: scan-cves
+        shell: pwsh
+        working-directory: ${{ inputs.working-directory }}
+        run: |
+          $scriptPath = ".github/scripts/CVE-Scan.ps1"
+          & $scriptPath -initialDirectory $pwd
+
+      - name: Post-Scan Teardown
+        id: post-scan
+        shell: pwsh
+        working-directory: ${{ inputs.working-directory }}
+        run: |
+          $scriptPath = ".github/scripts/Utilities.ps1"
+          . $scriptPath
+          Post-Scan-Teardown
