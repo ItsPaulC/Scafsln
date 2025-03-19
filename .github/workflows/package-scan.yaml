@@ -38,25 +38,21 @@ jobs:
           . $scriptPath
           Pre-Scan-Setup
       
-      # - name: Run Restricted Packages Scan
-        # id: scan-packages
-        # shell: pwsh
-        # working-directory: ${{ inputs.working-directory }}
-        # run: |
-        #   $scriptPath = ".github/scripts/Restricted-Packages-Scan.ps1"
-        #   $result = & $scriptPath -initialDirectory $pwd
+      - name: Run Deprecated Packages Scan
+        id: scan-deprecated
+        shell: pwsh
+        working-directory: ${{ inputs.working-directory }}
+        run: |
+          $scriptPath = ".github/scripts/Deprecated-Scan.ps1"
+          & $scriptPath -initialDirectory $pwd
           
-        #   # Check if restricted packages were found
-        #   $restrictedPackagesFound = $result -match "Restricted Packages Found!"
-          
-        #   # Set output variable for other workflows
-        #   echo "restricted-packages-found=$restrictedPackagesFound" >> $env:GITHUB_OUTPUT
-          
-        #   # Fail the job if restricted packages were found
-        #   if ($restrictedPackagesFound) {
-        #     Write-Error "Restricted packages were found in the solution."
-        #     exit 1
-        #   }
+      - name: Run Restricted Packages Scan
+        id: scan-restricted
+        shell: pwsh
+        working-directory: ${{ inputs.working-directory }}
+        run: |
+          $scriptPath = ".github/scripts/Restricted-Packages-Scan.ps1"
+          & $scriptPath -initialDirectory $pwd
 
       - name: Run Package CVE Scan
         id: scan-cves
