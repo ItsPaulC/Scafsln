@@ -1,10 +1,10 @@
-﻿name: CVE Vulnerability Scan
+name: Package Vulnerability Scan
 
 on:
   workflow_call:
     inputs:
       working-directory:
-        description: 'Directory to scan for CVE vulnerabilities'
+        description: 'Directory to scan for package vulnerabilities'
         required: false
         type: string
         default: '.'
@@ -15,7 +15,7 @@ on:
 
 jobs:
   scan:
-    name: Scan for CVE Vulnerabilities
+    name: Scan for Package Vulnerabilities
     runs-on: windows-latest
     outputs:
       vulnerabilities-found: ${{ steps.scan-cves.outputs.vulnerabilities-found }}
@@ -29,7 +29,7 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Run CVE Vulnerability Scan
+      - name: Run Package Vulnerability Scan
         id: scan-cves
         shell: pwsh
         working-directory: ${{ inputs.working-directory }}

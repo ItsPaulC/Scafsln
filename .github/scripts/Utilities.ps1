@@ -217,6 +217,7 @@ function New-Solution-FromProjectPath {
 }
 
 function Pre-Scan-Setup {
+    # Clear the global variable, just in case
     $global:ScanSolutionPath = $null
     
 }
