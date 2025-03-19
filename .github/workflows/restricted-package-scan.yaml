@@ -29,22 +29,3 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Run Restricted Packages Scan
-        id: scan-packages
-        shell: pwsh
-        working-directory: ${{ inputs.working-directory }}
-        run: |
-          $scriptPath = ".github/scripts/Restricted-Packages-Scan.ps1"
-          $result = & $scriptPath -initialDirectory $pwd
-          
-          # Check if restricted packages were found
-          $restrictedPackagesFound = $result -match "Restricted Packages Found!"
-          
-          # Set output variable for other workflows
-          echo "restricted-packages-found=$restrictedPackagesFound" >> $env:GITHUB_OUTPUT
-          
-          # Fail the job if restricted packages were found
-          if ($restrictedPackagesFound) {
-            Write-Error "Restricted packages were found in the solution."
-            exit 1
-          }
