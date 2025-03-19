@@ -29,22 +29,28 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Run Package Vulnerability Scan
+      - name: Pre-Scan Setup
+        id: pre-scan
+        shell: pwsh
+        working-directory: ${{ inputs.working-directory }}
+        run: |
+          $scriptPath = ".github/scripts/Utilities.ps1"
+          . $scriptPath
+          Pre-Scan-Setup
+
+      - name: Run Package CVE Scan
         id: scan-cves
         shell: pwsh
         working-directory: ${{ inputs.working-directory }}
         run: |
           $scriptPath = ".github/scripts/CVE-Scan.ps1"
-          $result = & $scriptPath -initialDirectory $pwd
+          & $scriptPath -initialDirectory $pwd
 
-          # Check if high/critical vulnerabilities were found
-          $vulnerabilitiesFound = $result -match "High/Critical Vulnerabilities Found!"
-
-          # Set output variable for other workflows
-          echo "vulnerabilities-found=$vulnerabilitiesFound" >> $env:GITHUB_OUTPUT
-
-          # Fail the job if vulnerabilities were found
-          if ($vulnerabilitiesFound) {
-            Write-Error "High or critical vulnerabilities were found in the solution packages."
-            exit 1
-          }
+      - name: Post-Scan Teardown
+        id: post-scan
+        shell: pwsh
+        working-directory: ${{ inputs.working-directory }}
+        run: |
+          $scriptPath = ".github/scripts/Utilities.ps1"
+          . $scriptPath
+          Post-Scan-Teardown
