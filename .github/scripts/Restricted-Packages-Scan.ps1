@@ -1,54 +1,33 @@
- param(
+param(
      [string]$initialDirectory = (Get-Location).Path
- )
+)
 
 # Import the utility functions
 $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
-$utilityScriptPath = Join-Path -Path $scriptPath -ChildPath "Utilities.ps1"
+$scanUtilityScriptPath = Join-Path -Path $scriptPath -ChildPath "Scan-Utilities.ps1"
 
 # Check if the utility script exists and source it
-if (-not (Test-Path -Path $utilityScriptPath)) {
-    Write-Error "Required utility script not found: $utilityScriptPath"
+if (-not (Test-Path -Path $scanUtilityScriptPath)) {
+    Write-Error "Required utility script not found: $scanUtilityScriptPath"
     exit 1
 }
 
 # Dot source the utility script to import the functions
-. $utilityScriptPath
+. $scanUtilityScriptPath
 
-####################################################################################################
-# Add packages to restrict to the $restrictedPackages array below
-# The script will check the version of each package found in the solution against the restrictions
+# Import the general utility functions
+$generalUtilityScriptPath = Join-Path -Path $scriptPath -ChildPath "General-Utilities.ps1"
 
-# To restrict a version you can do a min/max range, or just a min or max by setting the other to $null
-# To restrict a version to a single version, set both min and max to the same version
+if (-not (Test-Path -Path $generalUtilityScriptPath)) {
+    Write-Error "Required general utility script not found: $generalUtilityScriptPath"
+    exit 1
+}
 
-# Examples:
-# MinVersion       - MaxVersion       - Description
-# [version]"7.2.0" - [version]"7.2.0" - 7.2.0 only
-# [version]"7.2.0" - [version]"7.3.0" - 7.2.0 to 7.3.0
-# $null            - [version]"7.3.0" - 7.3.0 or greater
-# [version]"7.2.0" - $null            - 7.2.0 or less
-
-
-$restrictedPackages = @(
-    [PSCustomObject]@{
-        PackageName = "FluentAssertions"
-        MinVersion = $null
-        MaxVersion = [version]"7.1.0"
-        Reason = "FluentAssertions 8, and above is a pay product."
-    },
-    [PSCustomObject]@{
-        PackageName = "Moq"
-        MinVersion = [version]"4.20.0"
-        MaxVersion = [version]"4.20.0"
-        Reason = "Moq phones home (SponsorLink) with version 4.20.0."
-    }
-)
-
+. $generalUtilityScriptPath
 
 #region Main Script
 
-    ##########
+    ########## 
     # Capture just the string return value
     $slnPath = (New-Solution-FromProjectPath -startDir $initialDirectory).Trim()
     
@@ -83,7 +62,7 @@ $restrictedPackages = @(
         }
     }
 
-    # Display packages in table format using the function from Utilities.ps1
+    # Display packages in table format using the function from Scan-Utilities.ps1
     Format-TableOutput -Data $foundPackages -Title "Found Package References" -TitleColor Cyan
 
     # Display restricted packages

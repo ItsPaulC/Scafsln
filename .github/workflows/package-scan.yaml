@@ -34,7 +34,7 @@ jobs:
         shell: pwsh
         working-directory: ${{ inputs.working-directory }}
         run: |
-          $scriptPath = ".github/scripts/Utilities.ps1"
+          $scriptPath = ".github/scripts/Scan-Utilities.ps1"
           . $scriptPath
           Pre-Scan-Setup
       
@@ -67,6 +67,6 @@ jobs:
         shell: pwsh
         working-directory: ${{ inputs.working-directory }}
         run: |
-          $scriptPath = ".github/scripts/Utilities.ps1"
+          $scriptPath = ".github/scripts/Scan-Utilities.ps1"
           . $scriptPath
           Post-Scan-Teardown
