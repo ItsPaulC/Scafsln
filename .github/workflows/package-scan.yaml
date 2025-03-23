@@ -37,21 +37,21 @@ jobs:
           $scriptPath = ".github/scripts/Scan-Utilities.ps1"
           . $scriptPath
           Pre-Scan-Setup
-      
-      - name: Run Deprecated Packages Scan
-        id: scan-deprecated
-        shell: pwsh
-        working-directory: ${{ inputs.working-directory }}
-        run: |
-          $scriptPath = ".github/scripts/Deprecated-Scan.ps1"
-          & $scriptPath -initialDirectory $pwd
-          
+
       - name: Run Restricted Packages Scan
         id: scan-restricted
         shell: pwsh
         working-directory: ${{ inputs.working-directory }}
         run: |
           $scriptPath = ".github/scripts/Restricted-Packages-Scan.ps1"
+          & $scriptPath -initialDirectory $pwd
+
+      - name: Run Deprecated Packages Scan
+        id: scan-deprecated
+        shell: pwsh
+        working-directory: ${{ inputs.working-directory }}
+        run: |
+          $scriptPath = ".github/scripts/Deprecated-Scan.ps1"
           & $scriptPath -initialDirectory $pwd
 
       - name: Run Package CVE Scan
