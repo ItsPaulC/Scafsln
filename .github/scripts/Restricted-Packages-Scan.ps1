@@ -4,16 +4,25 @@ param(
 
 # Import the utility functions
 $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
-$utilityScriptPath = Join-Path -Path $scriptPath -ChildPath "Utilities.ps1"
+$generalUtilityScriptPath = Join-Path -Path $scriptPath -ChildPath "General-Utilities.ps1"
+$scanUtilityScriptPath = Join-Path -Path $scriptPath -ChildPath "Scan-Utilities.ps1"
 
 # Check if the utility script exists and source it
-if (-not (Test-Path -Path $utilityScriptPath)) {
-    Write-Error "Required utility script not found: $utilityScriptPath"
+if (-not (Test-Path -Path $generalUtilityScriptPath)) {
+    Write-Error "Required General-Utilities script not found: $generalUtilityScriptPath"
     exit 1
 }
 
-# Dot source the utility script to import the functions
-. $utilityScriptPath
+if (-not (Test-Path -Path $scanUtilityScriptPath)) {
+    Write-Error "Required Scan-Utilities script not found: $scanUtilityScriptPath"
+    exit 1
+}
+
+
+# Dot source the utility scripts to import the functions
+. $generalUtilityScriptPath
+. $scanUtilityScriptPath
+
 
 ####################################################################################################
 # Add packages to restrict to the $restrictedPackages array below
