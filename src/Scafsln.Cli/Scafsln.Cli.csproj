@@ -23,9 +23,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Prism.Plugin.Popups.Unity" Version="2.1.0.228" />
+    <PackageReference Include="FluentAssertions" Version="8.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
-    <PackageReference Include="Prism.Plugin.Popups.Unity" Version="2.1.0.228" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
