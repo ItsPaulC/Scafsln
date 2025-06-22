@@ -20,10 +20,12 @@
     <PackageTags>dotnet-tool;solution;configuration;standards</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <AssemblyName>Scafsln</AssemblyName>
+    <PublishSingleFile>true</PublishSingleFile>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier> <!-- Adjust for your target platform -->
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile> <!-- Optional: Compress the file -->
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Prism.Plugin.Popups.Unity" Version="2.1.0.228" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
     <PackageReference Include="Prism.Plugin.Popups.Unity" Version="2.1.0.228" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />

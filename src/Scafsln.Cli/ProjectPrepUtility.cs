@@ -15,6 +15,11 @@ public static class ProjectPrepUtility
     private record PackageInfo(string Name, string Version, bool HasVersionConstraint);
     private static readonly Regex VersionConstraintPattern = new(@"[\*\>\<\^\~\[\]]");
 
+
+    ///
+    private static string NetAnalyzersVersion = "9.0.0";
+
+
     /// <summary>
     /// Creates a Directory.Packages.props file at the specified path for central package management
     /// </summary>
@@ -50,7 +55,10 @@ public static class ProjectPrepUtility
             }
         }
 
-        // Filter out constrained versions and determine highest versions
+        // Add Microsoft.CodeAnalysis.NetAnalyzers explicitly with a fixed version
+        packageVersions.Add("Microsoft.CodeAnalysis.NetAnalyzers", [new PackageInfo("Microsoft.CodeAnalysis.NetAnalyzers", NetAnalyzersVersion, false)]);
+
+        // Filter out constrained versions and determine the highest versions
         Dictionary<string, string?> highestVersions = packageVersions
             .ToDictionary(
                 kvp => kvp.Key,
@@ -69,6 +77,8 @@ public static class ProjectPrepUtility
         {
             UpdateProjectFile(projectFile, highestVersions);
         }
+
+
 
         // Create Directory.Packages.props with highest versions (excluding constrained versions)
         string packagesPropsPath = Path.Combine(conversionPath, "Directory.Packages.props");
