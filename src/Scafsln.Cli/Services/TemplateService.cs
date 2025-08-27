@@ -25,9 +25,9 @@ public class TemplateService : IDisposable
     /// Gets the current template file content from the database
     /// </summary>
     /// <returns>The template file content</returns>
-    public async Task<TemplateFileContent?> GetTemplateContentAsync()
+    public async Task<TemplateFileContent?> GetTemplateContentAsync(CancellationToken cancellationToken)
     {
-        return await _dbContext.TemplateContents.FirstOrDefaultAsync();
+        return await _dbContext.TemplateContents.FirstOrDefaultAsync(cancellationToken);
     }
 
     /// <summary>
@@ -35,11 +35,11 @@ public class TemplateService : IDisposable
     /// </summary>
     /// <param name="content">The new editor config template content</param>
     /// <returns>A task representing the asynchronous operation</returns>
-    public async Task UpdateEditorConfigTemplateAsync(string content)
+    public async Task UpdateEditorConfigTemplateAsync(string content, CancellationToken cancellationToken)
     {
-        TemplateFileContent template = await GetOrCreateTemplateAsync();
+        TemplateFileContent template = await GetOrCreateTemplateAsync(cancellationToken);
         template.EditorconfigTemplate = content;
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
     /// <summary>
@@ -47,11 +47,11 @@ public class TemplateService : IDisposable
     /// </summary>
     /// <param name="content">The new gitignore template content</param>
     /// <returns>A task representing the asynchronous operation</returns>
-    public async Task UpdateGitignoreTemplateAsync(string content)
+    public async Task UpdateGitignoreTemplateAsync(string content, CancellationToken cancellationToken)
     {
-        TemplateFileContent template = await GetOrCreateTemplateAsync();
+        TemplateFileContent template = await GetOrCreateTemplateAsync(cancellationToken);
         template.GitignoreTemplate = content;
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
     /// <summary>
@@ -59,27 +59,27 @@ public class TemplateService : IDisposable
     /// </summary>
     /// <param name="content">The new copilot instructions template content</param>
     /// <returns>A task representing the asynchronous operation</returns>
-    public async Task UpdateCopilotInstructionsTemplateAsync(string content)
+    public async Task UpdateCopilotInstructionsTemplateAsync(string content, CancellationToken cancellationToken)
     {
-        TemplateFileContent template = await GetOrCreateTemplateAsync();
+        TemplateFileContent template = await GetOrCreateTemplateAsync(cancellationToken);
         template.CopilotInstructionsTemplate = content;
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
     /// <summary>
     /// Resets the template file content to default values from FileContents
     /// </summary>
     /// <returns>A task representing the asynchronous operation</returns>
-    public async Task ResetTemplatesAsync()
+    public async Task ResetTemplatesAsync(CancellationToken cancellationToken)
     {
         // Get all templates from database
-        List<TemplateFileContent> templates = await _dbContext.TemplateContents.ToListAsync();
-        
+        List<TemplateFileContent> templates = await _dbContext.TemplateContents.ToListAsync(cancellationToken);
+
         if (templates.Any())
         {
             // Delete all existing templates first
             _dbContext.TemplateContents.RemoveRange(templates);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync(cancellationToken);
         }
         
         // Add a new template with default values
@@ -91,16 +91,16 @@ public class TemplateService : IDisposable
         };
         
         _dbContext.TemplateContents.Add(newTemplate);
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
     /// <summary>
     /// Gets the existing template content or creates a new one if none exists
     /// </summary>
     /// <returns>The template content entity</returns>
-    private async Task<TemplateFileContent> GetOrCreateTemplateAsync()
+    private async Task<TemplateFileContent> GetOrCreateTemplateAsync(CancellationToken cancellationToken)
     {
-        var template = await _dbContext.TemplateContents.FirstOrDefaultAsync();
+        var template = await _dbContext.TemplateContents.FirstOrDefaultAsync(cancellationToken);
         
         if (template == null)
         {
@@ -112,7 +112,7 @@ public class TemplateService : IDisposable
             };
             
             _dbContext.TemplateContents.Add(template);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync(cancellationToken);
         }
         
         return template;

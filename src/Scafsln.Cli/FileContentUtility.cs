@@ -44,7 +44,7 @@ public static class FileContentUtility
         string content = File.ReadAllText(sourcePath);
         
         using TemplateService service = new();
-        service.UpdateGitignoreTemplateAsync(content).GetAwaiter().GetResult();
+        service.UpdateGitignoreTemplateAsync(content, CancellationToken.None).GetAwaiter().GetResult();
     }
 
     /// <summary>
@@ -68,7 +68,7 @@ public static class FileContentUtility
         string content = File.ReadAllText(sourcePath);
         
         using TemplateService service = new();
-        service.UpdateEditorConfigTemplateAsync(content).GetAwaiter().GetResult();
+        service.UpdateEditorConfigTemplateAsync(content, CancellationToken.None).GetAwaiter().GetResult();
     }
 
     /// <summary>
@@ -92,7 +92,7 @@ public static class FileContentUtility
         string content = File.ReadAllText(sourcePath);
         
         using TemplateService service = new();
-        service.UpdateCopilotInstructionsTemplateAsync(content).GetAwaiter().GetResult();
+        service.UpdateCopilotInstructionsTemplateAsync(content, CancellationToken.None).GetAwaiter().GetResult();
     }
 
     /// <summary>
@@ -101,7 +101,7 @@ public static class FileContentUtility
     public static void Reset()
     {
         using TemplateService service = new();
-        service.ResetTemplatesAsync().GetAwaiter().GetResult();
+        service.ResetTemplatesAsync(CancellationToken.None).GetAwaiter().GetResult();
     }
 
     /// <summary>
@@ -113,7 +113,7 @@ public static class FileContentUtility
         try
         {
             using var service = new TemplateService();
-            TemplateFileContent? template = service.GetTemplateContentAsync().GetAwaiter().GetResult();
+            TemplateFileContent? template = service.GetTemplateContentAsync(CancellationToken.None).GetAwaiter().GetResult();
             return template?.GitignoreTemplate ?? FileContents.GitIgnoreContent;
         }
         catch (Exception ex)
@@ -132,7 +132,7 @@ public static class FileContentUtility
         try
         {
             using var service = new TemplateService();
-            TemplateFileContent? template = service.GetTemplateContentAsync().GetAwaiter().GetResult();
+            TemplateFileContent? template = service.GetTemplateContentAsync(cancellationToken: CancellationToken.None).GetAwaiter().GetResult();
             return template?.EditorconfigTemplate ?? FileContents.EditorConfigContent;
         }
         catch (Exception ex)
@@ -151,7 +151,7 @@ public static class FileContentUtility
         try
         {
             using var service = new TemplateService();
-            TemplateFileContent? template = service.GetTemplateContentAsync().GetAwaiter().GetResult();
+            TemplateFileContent? template = service.GetTemplateContentAsync(cancellationToken: CancellationToken.None).GetAwaiter().GetResult();
             return template?.CopilotInstructionsTemplate ?? FileContents.CopilotInstructions;
         }
         catch (Exception ex)
