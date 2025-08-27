@@ -20,6 +20,10 @@ public class InitCommand : Command<InitCommand.InitSettings>
         [Description("Add .editorconfig file to the solution")]
         public bool UseEditorConfig { get; set; }
 
+        [CommandOption("-i|--ci")]
+        [Description("Add copilot-instructions.md")]
+        public bool UseCopilotInstructions { get; set; }
+
         [CommandOption("-a|--all")]
         [Description("Add all configuration files to the solution")]
         public bool UseAll { get; set; }
@@ -64,6 +68,7 @@ public class InitCommand : Command<InitCommand.InitSettings>
         bool shouldAddCpm = settings.UseCpm || settings.UseAll;
         bool shouldAddGitignore = settings.UseGitignore || settings.UseAll;
         bool shouldAddEditorConfig = settings.UseEditorConfig || settings.UseAll;
+        bool shouldAddCopilotInstructions = settings.UseCopilotInstructions || settings.UseAll;
 
         if (shouldAddCpm)
         {
@@ -110,7 +115,22 @@ public class InitCommand : Command<InitCommand.InitSettings>
             }
         }
 
-        if (!shouldAddCpm && !shouldAddGitignore && !shouldAddEditorConfig)
+        if (shouldAddCopilotInstructions)
+        {
+            AnsiConsole.MarkupLine("[green]Adding copilot-instructions.md...[/]");
+            try
+            {
+                ProjectPrepUtility.CreateCopilotInstructions(settings.Path);
+                AnsiConsole.MarkupLine("[green]Successfully created .github/copilot-instructions.md[/]");
+            }
+            catch (Exception ex) when (ex is ArgumentNullException or ArgumentException or DirectoryNotFoundException)
+            {
+                AnsiConsole.MarkupLine($"[red]Error creating copilot-instructions.md: {ex.Message}[/]");
+                return 1;
+            }
+        }
+
+        if (!shouldAddCpm && !shouldAddGitignore && !shouldAddEditorConfig && !shouldAddCopilotInstructions)
             AnsiConsole.MarkupLine("[yellow]No options selected. Use -h or --help to see available options.[/]");
 
         return 0;

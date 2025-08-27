@@ -19,6 +19,11 @@ public static class FileContentUtility
     public static string EditorConfigContent => LoadEditorconfigTemplate();
 
     /// <summary>
+    /// Gets the default copilot-instructions.md content for .NET projects
+    /// </summary>
+    public static string CopilotInstructionsContent => LoadCopilotInstructionsTemplate();
+
+    /// <summary>
     /// Updates the .gitignore template by copying the contents from the specified file
     /// </summary>
     /// <param name="sourcePath">The full path to the .gitignore file to read from</param>
@@ -39,7 +44,7 @@ public static class FileContentUtility
         string content = File.ReadAllText(sourcePath);
         
         using TemplateService service = new();
-        service.UpdateGitignoreTemplateAsync(content).GetAwaiter().GetResult();
+        service.UpdateGitignoreTemplateAsync(content, CancellationToken.None).GetAwaiter().GetResult();
     }
 
     /// <summary>
@@ -63,7 +68,31 @@ public static class FileContentUtility
         string content = File.ReadAllText(sourcePath);
         
         using TemplateService service = new();
-        service.UpdateEditorConfigTemplateAsync(content).GetAwaiter().GetResult();
+        service.UpdateEditorConfigTemplateAsync(content, CancellationToken.None).GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// Updates the copilot-instructions.md template by copying the contents from the specified file
+    /// </summary>
+    /// <param name="sourcePath">The full path to the copilot-instructions.md file to read from</param>
+    /// <exception cref="ArgumentNullException">Thrown when path is null</exception>
+    /// <exception cref="ArgumentException">Thrown when path is empty or whitespace</exception>
+    /// <exception cref="FileNotFoundException">Thrown when the specified file does not exist</exception>
+    /// <exception cref="IOException">Thrown when there's an error creating the Templates directory or saving the file</exception>
+    public static void UpdateCopilotInstructionsContent(string sourcePath)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(sourcePath);
+
+        if (!File.Exists(sourcePath))
+        {
+            throw new FileNotFoundException($"File not found: {sourcePath}");
+        }
+
+        // Read the contents from the provided file and update in database
+        string content = File.ReadAllText(sourcePath);
+        
+        using TemplateService service = new();
+        service.UpdateCopilotInstructionsTemplateAsync(content, CancellationToken.None).GetAwaiter().GetResult();
     }
 
     /// <summary>
@@ -72,7 +101,7 @@ public static class FileContentUtility
     public static void Reset()
     {
         using TemplateService service = new();
-        service.ResetTemplatesAsync().GetAwaiter().GetResult();
+        service.ResetTemplatesAsync(CancellationToken.None).GetAwaiter().GetResult();
     }
 
     /// <summary>
@@ -84,7 +113,7 @@ public static class FileContentUtility
         try
         {
             using var service = new TemplateService();
-            TemplateFileContent? template = service.GetTemplateContentAsync().GetAwaiter().GetResult();
+            TemplateFileContent? template = service.GetTemplateContentAsync(CancellationToken.None).GetAwaiter().GetResult();
             return template?.GitignoreTemplate ?? FileContents.GitIgnoreContent;
         }
         catch (Exception ex)
@@ -103,13 +132,32 @@ public static class FileContentUtility
         try
         {
             using var service = new TemplateService();
-            TemplateFileContent? template = service.GetTemplateContentAsync().GetAwaiter().GetResult();
+            TemplateFileContent? template = service.GetTemplateContentAsync(cancellationToken: CancellationToken.None).GetAwaiter().GetResult();
             return template?.EditorconfigTemplate ?? FileContents.EditorConfigContent;
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine($"Error loading .editorconfig template: {ex.Message}");
             return FileContents.EditorConfigContent;
+        }
+    }
+
+    /// <summary>
+    /// Loads the copilot-instructions.md template content from the database or default content
+    /// </summary>
+    /// <returns>The copilot-instructions.md template content</returns>
+    private static string LoadCopilotInstructionsTemplate()
+    {
+        try
+        {
+            using var service = new TemplateService();
+            TemplateFileContent? template = service.GetTemplateContentAsync(cancellationToken: CancellationToken.None).GetAwaiter().GetResult();
+            return template?.CopilotInstructionsTemplate ?? FileContents.CopilotInstructions;
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error loading copilot-instructions template: {ex.Message}");
+            return FileContents.CopilotInstructions;
         }
     }
 }

@@ -43,7 +43,19 @@ public class TemplateDbContext : DbContext
     /// </summary>
     public void EnsureSeeded()
     {
-        this.Database.EnsureCreated();
+        try
+        {
+            this.Database.EnsureCreated();
+
+            // Test if the database has the new schema by trying to access CopilotInstructionsTemplate
+            _ = TemplateContents.Select(t => t.CopilotInstructionsTemplate).FirstOrDefault();
+        }
+        catch (Microsoft.Data.Sqlite.SqliteException ex) when (ex.Message.Contains("no such column"))
+        {
+            // Database schema is outdated, recreate it
+            this.Database.EnsureDeleted();
+            this.Database.EnsureCreated();
+        }
 
         // Only seed if no template content exists
         if (!TemplateContents.Any())
@@ -51,7 +63,8 @@ public class TemplateDbContext : DbContext
             TemplateContents.Add(new TemplateFileContent
             {
                 EditorconfigTemplate = FileContents.EditorConfigContent,
-                GitignoreTemplate = FileContents.GitIgnoreContent
+                GitignoreTemplate = FileContents.GitIgnoreContent,
+                CopilotInstructionsTemplate = FileContents.CopilotInstructions
             });
 
             SaveChanges();
