@@ -55,6 +55,18 @@ public class TemplateService : IDisposable
     }
 
     /// <summary>
+    /// Updates the copilot instructions template content in the database
+    /// </summary>
+    /// <param name="content">The new copilot instructions template content</param>
+    /// <returns>A task representing the asynchronous operation</returns>
+    public async Task UpdateCopilotInstructionsTemplateAsync(string content)
+    {
+        TemplateFileContent template = await GetOrCreateTemplateAsync();
+        template.CopilotInstructionsTemplate = content;
+        await _dbContext.SaveChangesAsync();
+    }
+
+    /// <summary>
     /// Resets the template file content to default values from FileContents
     /// </summary>
     /// <returns>A task representing the asynchronous operation</returns>
@@ -74,7 +86,8 @@ public class TemplateService : IDisposable
         TemplateFileContent newTemplate = new()
         {
             EditorconfigTemplate = FileContents.EditorConfigContent,
-            GitignoreTemplate = FileContents.GitIgnoreContent
+            GitignoreTemplate = FileContents.GitIgnoreContent,
+            CopilotInstructionsTemplate = FileContents.CopilotInstructions
         };
         
         _dbContext.TemplateContents.Add(newTemplate);
@@ -94,7 +107,8 @@ public class TemplateService : IDisposable
             template = new TemplateFileContent
             {
                 EditorconfigTemplate = FileContents.EditorConfigContent,
-                GitignoreTemplate = FileContents.GitIgnoreContent
+                GitignoreTemplate = FileContents.GitIgnoreContent,
+                CopilotInstructionsTemplate = FileContents.CopilotInstructions
             };
             
             _dbContext.TemplateContents.Add(template);

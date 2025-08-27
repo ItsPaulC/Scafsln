@@ -8,6 +8,7 @@ A .NET CLI tool for initializing and standardizing .NET solution configurations.
 - **Build Properties**: Sets up common build settings and C# language features (automatically included with CPM)
 - **Editor Configuration**: Enforces consistent coding styles through `.editorconfig`
 - **Git Integration**: Provides standard `.gitignore` for .NET projects
+- **GitHub Copilot Integration**: Creates standardized copilot-instructions.md for consistent AI assistance
 - **Configuration Management**: View and update configuration files with template support
 - **Template Storage**: Persistent storage of templates using SQLite for improved reliability
 - **SemVer Support**: Robust NuGet package version comparison with support for non-standard version formats
@@ -36,6 +37,7 @@ The `path` argument is now optional. If not provided, the command will use the c
 - `-c|--cpm`: Convert to Nuget CPM in the solution (automatically includes Directory.Build.props)
 - `-g|--gitignore`: Add .gitignore file with .NET-specific patterns
 - `-e|--editorconfig`: Add .editorconfig with C# coding style settings
+- `-i|--ci`: Add copilot-instructions.md for GitHub Copilot guidance
 - `-a|--all`: Add all configuration files to the solution
 - `-h|--help`: Show help and usage information
 
@@ -51,12 +53,14 @@ Path is only required when using the change commands.
 
 - `--show-gitignore`: Display the contents of the current .gitignore template
 - `--show-editorconfig`: Display the contents of the current .editorconfig template
+- `--show-copilot-instructions`: Display the contents of the current copilot-instructions.md template
 - `--change-editorconfig <file>`: Update the .editorconfig template from a new source
 - `--change-gitignore <file>`: Update the .gitignore template from a new source
+- `--change-copilot-instructions <file>`: Update the copilot-instructions.md template from a new source
 - `--reset`: Reset templates to their default values
 - `-h|--help`: Show help and usage information
 
-When using the `--change-editorconfig` or `--change-gitignore` options, the provided file will be:
+When using the `--change-editorconfig`, `--change-gitignore`, or `--change-copilot-instructions` options, the provided file will be:
 - Saved as a template in the SQLite database for persistent storage
 - Used as the default content for future operations
 
@@ -82,6 +86,16 @@ Add editor config and gitignore:
 scafsln init-sln -e -g "C:\path\to\solution"
 ```
 
+Add GitHub Copilot instructions:
+```powershell
+scafsln init-sln -i
+```
+
+Add all configuration files including copilot instructions:
+```powershell
+scafsln init-sln --all
+```
+
 View .gitignore contents:
 ```powershell
 scafsln config --show-gitignore
@@ -90,6 +104,16 @@ scafsln config --show-gitignore
 Update .editorconfig template:
 ```powershell
 scafsln config --change-editorconfig "path\to\template.editorconfig"
+```
+
+View copilot instructions contents:
+```powershell
+scafsln config --show-copilot-instructions
+```
+
+Update copilot instructions template:
+```powershell
+scafsln config --change-copilot-instructions "path\to\custom-copilot-instructions.md"
 ```
 
 Reset templates to default:
@@ -123,6 +147,13 @@ scafsln config --reset
 - Ignores IDE-specific files
 - Handles NuGet package directories
 - Excludes sensitive files (*.user, *.pfx)
+
+### .github/copilot-instructions.md
+- Provides standardized GitHub Copilot instructions for .NET 8 development
+- Enforces modern C# 12 coding practices and idioms
+- Includes guidance for performance, security, and testing
+- Configures structured logging and telemetry standards
+- Ensures consistent AI-assisted code generation across the team
 
 ## Technical Implementation
 

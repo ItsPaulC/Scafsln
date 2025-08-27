@@ -19,4 +19,9 @@ public record TemplateFileContent
     /// Gets or sets the .gitignore template content
     /// </summary>
     public string? GitignoreTemplate { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the copilot-instructions.md template content
+    /// </summary>
+    public string? CopilotInstructionsTemplate { get; set; }
 }

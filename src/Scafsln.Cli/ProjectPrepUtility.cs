@@ -188,6 +188,36 @@ public static class ProjectPrepUtility
         File.WriteAllText(editorConfigPath, FileContentUtility.EditorConfigContent);
     }
 
+    /// <summary>
+    /// Creates a copilot-instructions.md file at the specified path with GitHub Copilot instructions for .NET development
+    /// </summary>
+    /// <param name="conversionPath">The full path where the copilot-instructions.md file should be created</param>
+    /// <exception cref="ArgumentNullException">Thrown when conversionPath is null</exception>
+    /// <exception cref="ArgumentException">Thrown when conversionPath is empty or whitespace</exception>
+    /// <exception cref="DirectoryNotFoundException">Thrown when the specified directory does not exist</exception>
+    public static void CreateCopilotInstructions(string conversionPath)
+    {
+        if (conversionPath is null)
+            throw new ArgumentNullException(nameof(conversionPath));
+
+        if (string.IsNullOrWhiteSpace(conversionPath))
+            throw new ArgumentException("Path cannot be empty or whitespace", nameof(conversionPath));
+
+        if (!Directory.Exists(conversionPath))
+            throw new DirectoryNotFoundException($"Directory not found: {conversionPath}");
+
+        string copilotInstructionsPath = Path.Combine(conversionPath, ".github", "copilot-instructions.md");
+        
+        // Create .github directory if it doesn't exist
+        string githubDir = Path.GetDirectoryName(copilotInstructionsPath)!;
+        if (!Directory.Exists(githubDir))
+        {
+            Directory.CreateDirectory(githubDir);
+        }
+        
+        File.WriteAllText(copilotInstructionsPath, FileContentUtility.CopilotInstructionsContent);
+    }
+
     private static IEnumerable<PackageInfo> GetPackageReferences(string projectPath)
     {
         XDocument doc = XDocument.Load(projectPath);
